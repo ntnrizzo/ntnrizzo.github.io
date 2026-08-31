@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="galho" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#b69a5c"/>
+      <stop offset="1" stop-color="#927746"/>
+    </linearGradient>
+    <linearGradient id="folha" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#91a184"/>
+      <stop offset="1" stop-color="#697c67"/>
+    </linearGradient>
+  </defs>
+
+  <!-- galho principal acompanhando a curva do canto -->
+  <path d="M9 51 C9 29, 20 16, 43 10 C57 7, 69 7, 81 9"
+        fill="none" stroke="url(#galho)" stroke-width="1.35"
+        stroke-linecap="round"/>
+
+  <!-- pequenos ramos -->
+  <path d="M15 33 C20 32, 25 28, 29 23
+           M25 20 C29 20, 34 17, 37 13
+           M37 13 C42 14, 47 12, 51 9
+           M12 42 C16 41, 20 38, 23 34"
+        fill="none" stroke="#9b814d" stroke-width="1"
+        stroke-linecap="round" opacity=".9"/>
+
+  <!-- folhas -->
+  <g fill="url(#folha)" stroke="#9b814d" stroke-width=".48">
+    <path d="M18 32 C14 27,15 23,20 22 C23 26,22 30,18 32Z"/>
+    <path d="M25 27 C22 22,24 18,29 18 C31 22,29 25,25 27Z"/>
+    <path d="M31 19 C28 15,30 12,35 12 C36 16,35 18,31 19Z"/>
+    <path d="M41 14 C39 10,42 7,46 8 C47 11,45 14,41 14Z"/>
+    <path d="M51 11 C50 7,53 5,57 7 C57 10,55 12,51 11Z"/>
+    <path d="M14 41 C10 38,11 34,15 33 C18 36,17 39,14 41Z"/>
+    <path d="M33 24 C37 20,41 21,42 25 C38 27,35 27,33 24Z"/>
+    <path d="M45 17 C49 14,53 15,54 18 C50 21,47 20,45 17Z"/>
+    <path d="M60 10 C64 7,68 8,69 11 C65 13,62 13,60 10Z"/>
+  </g>
+
+  <!-- florzinhas muito discretas -->
+  <g fill="#c49a9d" stroke="#a98475" stroke-width=".38">
+    <circle cx="26" cy="17" r="1.7"/>
+    <circle cx="24.4" cy="15.7" r="1.15"/>
+    <circle cx="27.6" cy="15.7" r="1.15"/>
+    <circle cx="58" cy="8" r="1.45"/>
+  </g>
+
+  <!-- pontinhos dourados -->
+  <g fill="#c7aa69" opacity=".86">
+    <circle cx="17" cy="25" r=".75"/>
+    <circle cx="39" cy="10" r=".65"/>
+    <circle cx="72" cy="9" r=".7"/>
+  </g>
+</svg>

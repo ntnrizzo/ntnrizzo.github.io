@@ -1,0 +1,165 @@
+<svg class="modal-moldura-svg" viewBox="0 0 420 700" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradiente do fundo do pergaminho -->
+    <radialGradient id="gradPergaminho" cx="50%" cy="48%" r="65%">
+      <stop offset="0%" stop-color="#fffef9"/>
+      <stop offset="45%" stop-color="#faf2df"/>
+      <stop offset="85%" stop-color="#f3e3c0"/>
+      <stop offset="100%" stop-color="#e8d2a4"/>
+    </radialGradient>
+
+    <!-- Gradiente da borda verde-petróleo rica (Jasmine Peacock Teal) -->
+    <linearGradient id="gradBordaTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#145d6a"/>
+      <stop offset="35%" stop-color="#0e4b56"/>
+      <stop offset="70%" stop-color="#196877"/>
+      <stop offset="100%" stop-color="#0a3942"/>
+    </linearGradient>
+
+    <!-- Gradiente Ouro Real 24k -->
+    <linearGradient id="gradOuro" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf1a9"/>
+      <stop offset="25%" stop-color="#dfba66"/>
+      <stop offset="50%" stop-color="#b8860b"/>
+      <stop offset="75%" stop-color="#e6c875"/>
+      <stop offset="100%" stop-color="#996515"/>
+    </linearGradient>
+
+    <!-- Gradiente Joia Turquesa / Safira Cyan -->
+    <radialGradient id="gradJoia" cx="35%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#80f7ff"/>
+      <stop offset="30%" stop-color="#00d0e8"/>
+      <stop offset="75%" stop-color="#007e94"/>
+      <stop offset="100%" stop-color="#004350"/>
+    </radialGradient>
+
+    <!-- Sombra suave para a joia -->
+    <filter id="brilhoJoia" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#003844" flood-opacity="0.5"/>
+    </filter>
+    
+    <!-- Sombra suave externa do modal -->
+    <filter id="sombraModal" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="15" stdDeviation="20" flood-color="#000000" flood-opacity="0.65"/>
+    </filter>
+  </defs>
+
+  <!-- 1. Borda Externa Turquesa/Teal com silhueta mourisca de cúpula árabe -->
+  <path d="
+    M 210, 14
+    C 195, 30 162, 54 135, 54
+    C 112, 54 90, 68 76, 90
+    C 65, 108 46, 118 34, 138
+    C 22, 158 14, 186 14, 222
+    L 14, 492
+    C 14, 528 22, 556 34, 576
+    C 46, 596 65, 606 76, 624
+    C 90, 646 112, 660 135, 660
+    C 162, 660 195, 684 210, 700
+    C 225, 684 258, 660 285, 660
+    C 308, 660 330, 646 344, 624
+    C 355, 606 374, 596 386, 576
+    C 398, 556 406, 528 406, 492
+    L 406, 222
+    C 406, 186 398, 158 386, 138
+    C 374, 118 355, 108 344, 90
+    C 330, 68 308, 54 285, 54
+    C 258, 54 225, 30 210, 14
+    Z"
+    fill="url(#gradBordaTeal)" 
+    stroke="url(#gradOuro)" 
+    stroke-width="1.8"
+    filter="url(#sombraModal)"
+  />
+
+  <!-- 2. Miolo de Pergaminho Real (Recortado com o arco mourisco) -->
+  <path d="
+    M 210, 26
+    C 198, 40 168, 62 143, 62
+    C 122, 62 102, 75 90, 95
+    C 80, 111 63, 120 52, 138
+    C 40, 156 32, 182 32, 215
+    L 32, 499
+    C 32, 532 40, 558 52, 576
+    C 63, 594 80, 603 90, 619
+    C 102, 639 122, 652 143, 652
+    C 168, 652 198, 674 210, 688
+    C 222, 674 252, 652 277, 652
+    C 298, 652 318, 639 330, 619
+    C 340, 603 357, 594 368, 576
+    C 380, 558 388, 532 388, 499
+    L 388, 215
+    C 388, 182 380, 156 368, 138
+    C 357, 120 340, 111 330, 95
+    C 318, 75 298, 62 277, 62
+    C 252, 62 222, 40 210, 26
+    Z"
+    fill="url(#gradPergaminho)"
+    stroke="url(#gradOuro)"
+    stroke-width="1.2"
+  />
+
+  <!-- 3. Filete Dourado Interno Decorativo -->
+  <path d="
+    M 210, 34
+    C 200, 47 172, 68 148, 68
+    C 128, 68 110, 80 99, 99
+    C 90, 113 74, 122 64, 138
+    C 53, 154 46, 178 46, 209
+    L 46, 505
+    C 46, 536 53, 560 64, 576
+    C 74, 592 90, 601 99, 615
+    C 110, 634 128, 646 148, 646
+    C 172, 646 200, 667 210, 680
+    C 220, 667 248, 646 272, 646
+    C 292, 646 310, 634 321, 615
+    C 330, 601 346, 592 356, 576
+    C 367, 560 374, 536 374, 505
+    L 374, 209
+    C 374, 178 367, 154 356, 138
+    C 346, 122 330, 113 321, 99
+    C 310, 80 292, 68 272, 68
+    C 248, 68 220, 47 210, 34
+    Z"
+    fill="none"
+    stroke="url(#gradOuro)"
+    stroke-width="0.8"
+    stroke-opacity="0.65"
+  />
+
+  <!-- 4. Ornamento de Filigrana e Joia Turquesa no Topo -->
+  <g transform="translate(210, 42)">
+    <!-- Arabescos dourados ao redor da joia -->
+    <path d="M -18, 4 C -12, -6 -4, -10 0, -10 C 4, -10 12, -6 18, 4" fill="none" stroke="url(#gradOuro)" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M -24, 8 C -16, 2 -8, 8 -4, 12" fill="none" stroke="url(#gradOuro)" stroke-width="1" stroke-linecap="round"/>
+    <path d="M 24, 8 C 16, 2 8, 8 4, 12" fill="none" stroke="url(#gradOuro)" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="-16" cy="-2" r="1.5" fill="url(#gradOuro)"/>
+    <circle cx="16" cy="-2" r="1.5" fill="url(#gradOuro)"/>
+    <circle cx="0" cy="-14" r="2" fill="url(#gradOuro)"/>
+    
+    <!-- Engaste de ouro da joia -->
+    <ellipse cx="0" cy="4" rx="7" ry="10" fill="url(#gradOuro)" stroke="#6d4b00" stroke-width="0.6"/>
+    <!-- Joia de Safira Cyan / Turquesa -->
+    <ellipse cx="0" cy="4" rx="5" ry="8" fill="url(#gradJoia)" filter="url(#brilhoJoia)"/>
+    <!-- Brilho especular branco -->
+    <ellipse cx="-1.5" cy="1.5" rx="1.8" ry="3" fill="#ffffff" opacity="0.85"/>
+  </g>
+
+  <!-- 5. Ornamento de Filigrana e Joia Turquesa na Base -->
+  <g transform="translate(210, 672)">
+    <!-- Arabescos dourados da base -->
+    <path d="M -22, -4 C -14, 4 -6, 8 0, 8 C 6, 8 14, 4 22, -4" fill="none" stroke="url(#gradOuro)" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M -28, -6 C -18, -2 -10, -6 -6, -10" fill="none" stroke="url(#gradOuro)" stroke-width="1" stroke-linecap="round"/>
+    <path d="M 28, -6 C 18, -2 10, -6 6, -10" fill="none" stroke="url(#gradOuro)" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="-20" cy="2" r="1.5" fill="url(#gradOuro)"/>
+    <circle cx="20" cy="2" r="1.5" fill="url(#gradOuro)"/>
+    <circle cx="0" cy="12" r="2" fill="url(#gradOuro)"/>
+
+    <!-- Engaste de ouro da joia -->
+    <ellipse cx="0" cy="-2" rx="7" ry="10" fill="url(#gradOuro)" stroke="#6d4b00" stroke-width="0.6"/>
+    <!-- Joia de Safira Cyan / Turquesa -->
+    <ellipse cx="0" cy="-2" rx="5" ry="8" fill="url(#gradJoia)" filter="url(#brilhoJoia)"/>
+    <!-- Brilho especular branco -->
+    <ellipse cx="-1.5" cy="-4.5" rx="1.8" ry="3" fill="#ffffff" opacity="0.85"/>
+  </g>
+</svg>
