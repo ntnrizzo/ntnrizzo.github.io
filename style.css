@@ -177,6 +177,8 @@ body {
   transform: translate(-50%, -50%);
   width: max(100%, calc(100dvh * 9 / 16));
   height: max(100dvh, calc(100vw * 16 / 9));
+  opacity: 0;
+  visibility: hidden;
   pointer-events: none;
   transition: opacity 0.8s ease, visibility 0.8s ease;
   z-index: 15;
@@ -212,10 +214,10 @@ body {
   top: 25.0%;
   left: 50.0%;
   transform: translate(-50%, -50%);
-  width: 46%;
+  width: 48%;
   text-align: center;
   font-family: 'Great Vibes', 'Playfair Display', cursive, Georgia, serif;
-  font-size: clamp(26px, 4.2vh, 42px);
+  font-size: clamp(28px, 4.4vh, 44px);
   font-weight: 700;
   color: #0b4550;
   letter-spacing: 0.5px;
@@ -238,18 +240,18 @@ body {
   }
 }
 
-/* Contagem Regressiva sobre o badge roxo */
+/* Contagem Regressiva sobre o badge */
 .contagem-regressiva {
   position: absolute;
   top: 73.0%;
   left: 50.0%;
   transform: translate(-50%, -50%);
-  width: 58.0%;
-  height: 4.6%;
+  width: 62.0%;
+  height: 5.0%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   pointer-events: none;
   z-index: 12;
   user-select: none;
@@ -283,31 +285,31 @@ body {
 
 .unidade-tempo .valor {
   font-family: 'Playfair Display', Georgia, serif;
-  font-size: clamp(14px, 2.0vh, 20px);
-  font-weight: 700;
+  font-size: clamp(17px, 2.5vh, 23px);
+  font-weight: 800;
   color: #fff8eb;
   letter-spacing: 0.5px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(255, 215, 0, 0.4);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85), 0 0 6px rgba(255, 215, 0, 0.45);
 }
 
 .unidade-tempo .rotulo {
-  font-size: clamp(8px, 1.05vh, 10.5px);
+  font-size: clamp(9px, 1.25vh, 12px);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   color: #f7e7ce;
   opacity: 0.95;
   margin-top: 1px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
 .separador {
   color: #f7e7ce;
-  font-size: clamp(12px, 1.6vh, 16px);
+  font-size: clamp(14px, 2.0vh, 18px);
   font-weight: 700;
-  margin-bottom: 3px;
-  opacity: 0.8;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  margin-bottom: 4px;
+  opacity: 0.85;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
 /* Botões interativos sobre os 4 círculos do vídeo */
@@ -1938,84 +1940,90 @@ body {
 
 @media (max-width: 480px) {
   .modal {
-    padding: 10px;
+    padding: 12px 8px;
   }
 
   .modal-card {
-    width: min(94vw, 430px);
-    border-radius: 38px 38px 28px 28px;
+    width: min(95vw, 450px);
+    max-height: calc(100dvh - 28px);
+    border-radius: 40px 40px 28px 28px;
   }
 
   .modal-card::after {
-    width: 34px;
-    height: 22px;
-    top: -12px;
+    width: 36px;
+    height: 24px;
+    top: -13px;
   }
 
   .modal-conteudo,
   .modal-conteudo--recado {
-    padding: 46px 20px 22px;
+    padding: 52px 22px 26px;
+    max-height: calc(100dvh - 54px);
   }
 
   .modal-medalhao {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 8px;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 9px;
   }
 
   .modal-medalhao svg {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
   }
 
   .modal-sobretitulo {
-    font-size: 11.5px;
-    letter-spacing: 1.35px;
+    font-size: 12px;
+    letter-spacing: 1.4px;
   }
 
   .modal-titulo {
-    font-size: clamp(27px, 7.8vw, 34px);
+    font-size: clamp(29px, 8.5vw, 38px);
   }
 
   .modal-descricao {
-    max-width: 320px;
-    font-size: 16px;
-    line-height: 1.45;
+    max-width: 350px;
+    font-size: 17px;
+    line-height: 1.5;
   }
 
   .dress-recado {
-    max-width: 340px;
-    padding: 24px 20px 22px;
+    max-width: 370px;
+    padding: 26px 20px 24px;
   }
 
   .dress-recado p {
-    font-size: 16px;
-    line-height: 1.52;
+    font-size: 16.8px;
+    line-height: 1.58;
   }
 
   .btn-acao-jasmine {
-    min-height: 48px;
-    font-size: 13.8px;
+    min-height: 50px;
+    font-size: 14.5px;
   }
 
   .capsula-local-jasmine .capsula-texto {
-    font-size: 13.5px;
+    font-size: 14.5px;
   }
 
   .endereco-linha-rua {
-    font-size: 15.5px;
+    font-size: 16.5px;
   }
 
   .endereco-linha-bairro {
-    font-size: 13px;
+    font-size: 13.5px;
   }
 
   .date-card {
-    grid-template-columns: 74px 1fr 80px;
+    grid-template-columns: 78px 1fr 84px;
   }
 
   .date-card__dia {
-    font-size: 32px;
+    font-size: 34px;
+  }
+
+  .modal-assinatura {
+    font-size: 14.5px;
   }
 }
 
