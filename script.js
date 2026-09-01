@@ -691,34 +691,298 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================
-  // PROTEÇÃO CONTRA CÓPIA, SALVAR E INSPEÇÃO
+  // ESTÚDIO / GRAVADOR TÁTIL COM INTENSIDADE VERTICAL
   // =========================================
-  // Desativa menu de contexto (botão direito e segurar o dedo no celular para salvar imagem)
-  document.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-  }, { passive: false });
+  const btnAbrirGravadorCapa = document.getElementById("btnAbrirGravadorCapa");
+  const gravadorTatel = document.getElementById("gravadorTatel");
+  const btnFecharGravador = document.getElementById("btnFecharGravador");
+  const padVibracao = document.getElementById("padVibracao");
+  const laserIntensidade = document.getElementById("laserIntensidade");
+  const laserTexto = document.getElementById("laserTexto");
+  const badgeIntensidade = document.getElementById("badgeIntensidade");
+  const tempoGravador = document.getElementById("tempoGravador");
+  const btnIniciarGravacao = document.getElementById("btnIniciarGravacao");
+  const btnTestarGravacao = document.getElementById("btnTestarGravacao");
+  const btnCopiarGravacao = document.getElementById("btnCopiarGravacao");
+  const txtCodigoGravado = document.getElementById("txtCodigoGravado");
 
-  // Desativa arrastar imagens e vídeos
-  document.addEventListener("dragstart", (e) => {
-    e.preventDefault();
-  }, { passive: false });
+  let gravando = false;
+  let gravacaoInicio = 0;
+  let gravadorTimerId = null;
+  let amostrasGravadas = [];
+  let toqueAtivo = false;
+  let intensidadeAtual = 0.5;
+  let loopVibracaoPwm = null;
 
-  // Desativa seleção acidental de elementos
-  document.addEventListener("selectstart", (e) => {
-    if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
-      e.preventDefault();
+  function abrirGravador() {
+    if (!gravadorTatel) return;
+    gravadorTatel.style.display = "flex";
+    if (capa) capa.style.display = "none";
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
     }
-  }, { passive: false });
+  }
 
-  // Bloqueia atalhos comuns de inspeção e salvamento (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I)
-  document.addEventListener("keydown", (e) => {
-    if (
-      e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c")) ||
-      (e.ctrlKey && (e.key === "U" || e.key === "u" || e.key === "S" || e.key === "s"))
-    ) {
-      e.preventDefault();
+  function fecharGravador() {
+    if (!gravadorTatel) return;
+    gravadorTatel.style.display = "none";
+    if (gravando) pararGravacao();
+    if (capa) {
+      capa.style.display = "";
+      capa.style.opacity = "1";
     }
-  });
+    pararVibracao();
+  }
+
+  if (btnAbrirGravadorCapa) btnAbrirGravadorCapa.addEventListener("click", abrirGravador);
+  if (btnFecharGravador) btnFecharGravador.addEventListener("click", fecharGravador);
+
+  if (window.location.hash.includes("gravador") || window.location.search.includes("gravador")) {
+    abrirGravador();
+  }
+
+  // Síntese PWM de Intensidade Tátil em Tempo Real
+  function iniciarLoopPwm() {
+    if (loopVibracaoPwm) clearInterval(loopVibracaoPwm);
+    loopVibracaoPwm = setInterval(() => {
+      if (!toqueAtivo) {
+        pararVibracao();
+        return;
+      }
+      const periodo = 28;
+      const msLigado = Math.max(4, Math.round(periodo * intensidadeAtual));
+      const msPausa = Math.max(0, periodo - msLigado);
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        try {
+          if (msPausa === 0) navigator.vibrate(periodo);
+          else navigator.vibrate([msLigado, msPausa]);
+        } catch (e) {}
+      }
+    }, 28);
+  }
+
+  function pararLoopPwm() {
+    if (loopVibracaoPwm) {
+      clearInterval(loopVibracaoPwm);
+      loopVibracaoPwm = null;
+    }
+    pararVibracao();
+  }
+
+  // Quanto mais alto o toque no painel, mais intensa a vibração
+  function atualizarPosicaoToque(e) {
+    if (!padVibracao) return;
+    const rect = padVibracao.getBoundingClientRect();
+    const clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+    const relY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+
+    const pct = Math.round((1 - relY) * 100);
+    intensidadeAtual = 0.12 + (1 - relY) * 0.88;
+
+    if (laserIntensidade) {
+      laserIntensidade.style.display = "block";
+      laserIntensidade.style.top = `${relY * 100}%`;
+    }
+    if (laserTexto) {
+      laserTexto.textContent = `${pct}% ${pct > 70 ? '🔥 FORTE' : pct > 35 ? '⚡ MÉDIO' : '🍃 SUAVE'}`;
+    }
+    if (badgeIntensidade) {
+      badgeIntensidade.textContent = `⚡ Força: ${pct}%`;
+    }
+
+    if (gravando) {
+      const decorrido = Math.round(performance.now() - gravacaoInicio);
+      amostrasGravadas.push({ time: decorrido, intensity: intensidadeAtual, active: true });
+    }
+  }
+
+  if (padVibracao) {
+    const aoIniciarToque = (e) => {
+      e.preventDefault();
+      toqueAtivo = true;
+      atualizarPosicaoToque(e);
+      iniciarLoopPwm();
+    };
+
+    const aoMoverToque = (e) => {
+      if (!toqueAtivo) return;
+      e.preventDefault();
+      atualizarPosicaoToque(e);
+    };
+
+    const aoEncerrarToque = (e) => {
+      e.preventDefault();
+      toqueAtivo = false;
+      pararLoopPwm();
+      if (laserIntensidade) laserIntensidade.style.display = "none";
+      if (badgeIntensidade) badgeIntensidade.textContent = "⚡ Toque no painel";
+      if (gravando) {
+        const decorrido = Math.round(performance.now() - gravacaoInicio);
+        amostrasGravadas.push({ time: decorrido, intensity: 0, active: false });
+      }
+    };
+
+    padVibracao.addEventListener("pointerdown", aoIniciarToque);
+    padVibracao.addEventListener("pointermove", aoMoverToque);
+    padVibracao.addEventListener("pointerup", aoEncerrarToque);
+    padVibracao.addEventListener("pointercancel", aoEncerrarToque);
+    padVibracao.addEventListener("pointerleave", aoEncerrarToque);
+  }
+
+  function formatarTempoMs(ms) {
+    const min = Math.floor(ms / 60000);
+    const sec = Math.floor((ms % 60000) / 1000);
+    const msec = ms % 1000;
+    return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(msec).padStart(3, '0')}`;
+  }
+
+  function iniciarGravacao() {
+    gravando = true;
+    amostrasGravadas = [];
+    toqueAtivo = false;
+    gravacaoInicio = performance.now();
+    btnIniciarGravacao.textContent = "⏹ Parar";
+    btnTestarGravacao.disabled = true;
+    btnCopiarGravacao.disabled = true;
+    txtCodigoGravado.value = "Gravando ritmo e intensidade... Toque e deslize o dedo para cima e para baixo!";
+
+    if (video) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    }
+
+    gravadorTimerId = setInterval(() => {
+      const decorrido = Math.round(performance.now() - gravacaoInicio);
+      if (tempoGravador) tempoGravador.textContent = formatarTempoMs(decorrido);
+      if (decorrido >= 18000) {
+        pararGravacao();
+      }
+    }, 30);
+  }
+
+  function compilarAmostrasEmPadraoPwm(amostras, duracaoTotal) {
+    if (!amostras || amostras.length === 0) return [];
+    
+    const blocoMs = 30;
+    const qtdBlocos = Math.ceil(duracaoTotal / blocoMs);
+    const pulsos = [];
+    let ponteiroAmostra = 0;
+
+    for (let b = 0; b < qtdBlocos; b++) {
+      const tInicio = b * blocoMs;
+      const tFim = tInicio + blocoMs;
+
+      let somaIntensidade = 0;
+      let count = 0;
+      let ativo = false;
+
+      while (ponteiroAmostra < amostras.length && amostras[ponteiroAmostra].time <= tFim) {
+        if (amostras[ponteiroAmostra].active) {
+          somaIntensidade += amostras[ponteiroAmostra].intensity;
+          count++;
+          ativo = true;
+        } else {
+          ativo = false;
+        }
+        ponteiroAmostra++;
+      }
+
+      if (ativo && count > 0) {
+        const intensidadeMedia = somaIntensidade / count;
+        const on = Math.max(4, Math.round(blocoMs * intensidadeMedia));
+        const off = blocoMs - on;
+        pulsos.push({ on, off });
+      } else {
+        pulsos.push({ on: 0, off: blocoMs });
+      }
+    }
+
+    const arrayFinal = [];
+    let pausaAcumulada = 0;
+
+    for (let i = 0; i < pulsos.length; i++) {
+      const p = pulsos[i];
+      if (p.on === 0) {
+        pausaAcumulada += p.off;
+      } else {
+        if (pausaAcumulada > 0) {
+          if (arrayFinal.length === 0) {
+            arrayFinal.push(0);
+            arrayFinal.push(pausaAcumulada);
+          } else {
+            arrayFinal.push(pausaAcumulada);
+          }
+          pausaAcumulada = 0;
+        }
+        arrayFinal.push(p.on);
+        if (p.off > 0) {
+          pausaAcumulada += p.off;
+        }
+      }
+    }
+
+    return arrayFinal;
+  }
+
+  function pararGravacao() {
+    gravando = false;
+    if (gravadorTimerId) clearInterval(gravadorTimerId);
+    btnIniciarGravacao.textContent = "▶ Gravar com o Vídeo";
+    pararLoopPwm();
+    if (video) video.pause();
+
+    const decorrido = Math.round(performance.now() - gravacaoInicio);
+    const padraoPwm = compilarAmostrasEmPadraoPwm(amostrasGravadas, decorrido);
+
+    if (padraoPwm.length > 0) {
+      btnTestarGravacao.disabled = false;
+      btnCopiarGravacao.disabled = false;
+      txtCodigoGravado.value = JSON.stringify(padraoPwm);
+      exibirToast("Gravação com intensidade concluída! Pronto para testar 📳");
+    } else {
+      txtCodigoGravado.value = "Nenhum toque foi registrado. Clique em Gravar e toque no painel!";
+    }
+  }
+
+  if (btnIniciarGravacao) {
+    btnIniciarGravacao.addEventListener("click", () => {
+      if (gravando) pararGravacao();
+      else iniciarGravacao();
+    });
+  }
+
+  if (btnTestarGravacao) {
+    btnTestarGravacao.addEventListener("click", () => {
+      try {
+        const padrao = JSON.parse(txtCodigoGravado.value);
+        if (Array.isArray(padrao) && navigator.vibrate) {
+          if (video) {
+            video.currentTime = 0;
+            video.play().catch(() => {});
+          }
+          navigator.vibrate(padrao);
+          exibirToast("Sentindo a vibração gravada com o vídeo... ✨");
+        }
+      } catch (err) {
+        exibirToast("Erro ao processar o padrão gravado.");
+      }
+    });
+  }
+
+  if (btnCopiarGravacao) {
+    btnCopiarGravacao.addEventListener("click", async () => {
+      if (txtCodigoGravado.value) {
+        try {
+          await navigator.clipboard.writeText(txtCodigoGravado.value);
+          exibirToast("Padrão copiado com sucesso! 📋");
+        } catch (err) {
+          txtCodigoGravado.select();
+          document.execCommand("copy");
+          exibirToast("Padrão copiado! 📋");
+        }
+      }
+    });
+  }
 
 });

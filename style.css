@@ -2131,3 +2131,291 @@ body {
     opacity: .72;
   }
 }
+
+/* =========================================================
+   BOTÃO DE ACESSO AO GRAVADOR NA CAPA
+   ========================================================= */
+.btn-abrir-gravador-capa {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 30;
+  background: rgba(30, 10, 20, 0.85);
+  color: #ffccd8;
+  border: 1.5px solid rgba(255, 180, 200, 0.6);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 180, 200, 0.3);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: auto !important;
+  touch-action: manipulation;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn-abrir-gravador-capa:active {
+  transform: scale(0.94);
+  background: rgba(60, 20, 40, 0.95);
+}
+
+/* =========================================================
+   ESTÚDIO HUD DE VIBRAÇÃO TÁTIL COM INTENSIDADE VERTICAL
+   ========================================================= */
+.gravador-tatel {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  background: rgba(8, 2, 6, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
+  user-select: none;
+  touch-action: none;
+}
+
+.gravador-hud {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 12px 14px;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+/* Topo do HUD */
+.gravador-hud__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(25, 8, 18, 0.88);
+  border: 1px solid rgba(255, 180, 200, 0.35);
+  border-radius: 16px;
+  padding: 8px 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+.gravador-hud__info h3 {
+  font-size: 13px;
+  color: #ffd8e2;
+  margin: 0;
+}
+
+.badge-intensidade {
+  font-size: 11px;
+  color: #ffb4c5;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+.gravador-hud__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gravador-cronometro {
+  font-family: ui-monospace, monospace;
+  font-size: 15px;
+  font-weight: 700;
+  color: #a3f7bf;
+  letter-spacing: 0.5px;
+}
+
+.btn-fechar-gravador {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+
+/* Área Central: Pad Vertical com Altura = Intensidade */
+.gravador-pad-container {
+  flex: 1;
+  min-height: 220px;
+  position: relative;
+  display: flex;
+}
+
+.pad-intensidade {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 20px;
+  border: 2px solid rgba(255, 190, 210, 0.55);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 105, 145, 0.65) 0%,
+    rgba(220, 60, 110, 0.45) 45%,
+    rgba(130, 25, 65, 0.35) 75%,
+    rgba(40, 10, 25, 0.3) 100%
+  );
+  box-shadow: inset 0 0 40px rgba(255, 105, 145, 0.2), 0 8px 30px rgba(0, 0, 0, 0.6);
+  cursor: crosshair;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.pad-intensidade__marcadores {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 14px;
+  pointer-events: none;
+}
+
+.marcador-nivel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.marcador-nivel--topo {
+  color: #fff0f4;
+  border-top: 1px dashed rgba(255, 255, 255, 0.4);
+  padding-top: 4px;
+}
+
+.marcador-nivel--meio {
+  color: #ffc4d4;
+  border-top: 1px dashed rgba(255, 255, 255, 0.25);
+  padding-top: 4px;
+}
+
+.marcador-nivel--base {
+  color: #e099ad;
+  border-top: 1px dashed rgba(255, 255, 255, 0.2);
+  padding-top: 4px;
+}
+
+.pad-intensidade__instrucao {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.pad-intensidade__instrucao span {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pad-intensidade__instrucao small {
+  font-size: 11.5px;
+  color: #ffd8e2;
+}
+
+/* Linha Laser que segue o toque */
+.laser-intensidade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #ffffff;
+  box-shadow: 0 0 16px 4px #ff5080, 0 0 30px #ffffff;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.laser-texto {
+  position: absolute;
+  right: 12px;
+  bottom: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid #ff90b0;
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  font-family: ui-monospace, monospace;
+}
+
+/* Barra Inferior */
+.gravador-hud__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gravador-hud__botoes {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-gravador-acao {
+  padding: 10px 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(45, 15, 30, 0.9);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s, transform 0.1s;
+  pointer-events: auto !important;
+}
+
+.btn-gravador-acao:active {
+  transform: scale(0.95);
+}
+
+.btn-gravador-acao:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-gravador-acao--gravar {
+  background: #7a1e3b;
+  border-color: #ff85a1;
+}
+
+.btn-gravador-acao--copiar {
+  background: #401830;
+  border-color: #ffccd8;
+}
+
+.gravador-textarea {
+  width: 100%;
+  height: 48px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: #a3f7bf;
+  font-family: ui-monospace, monospace;
+  font-size: 10.5px;
+  padding: 6px 8px;
+  resize: none;
+  box-sizing: border-box;
+}

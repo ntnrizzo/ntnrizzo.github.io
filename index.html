@@ -21,6 +21,9 @@
       <img src="assets/Video.jpg" alt="Capa do convite" draggable="false">
     </div>
     <button id="btnAbrir" aria-label="Abrir convite"></button>
+    <button id="btnAbrirGravadorCapa" class="btn-abrir-gravador-capa" type="button" aria-label="Abrir gravador de vibração tátil">
+      🎙️ Gravar Vibração
+    </button>
   </div>
 
   <!-- Palco principal com o vídeo e os botões invisíveis -->
@@ -406,6 +409,52 @@
   </div>
 
   <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Painel Estúdio HUD / Gravador com Intensidade Vertical -->
+  <div id="gravadorTatel" class="gravador-tatel" style="display: none;">
+    <div class="gravador-hud">
+      <!-- Topo: Título, Fechar e Timer -->
+      <div class="gravador-hud__header">
+        <div class="gravador-hud__info">
+          <h3>🎙️ Gravador de Vibração Tátil</h3>
+          <span id="badgeIntensidade" class="badge-intensidade">⚡ Toque no painel</span>
+        </div>
+        <div class="gravador-hud__right">
+          <span id="tempoGravador" class="gravador-cronometro">00:00.000</span>
+          <button id="btnFecharGravador" class="btn-fechar-gravador" aria-label="Fechar gravador">&times;</button>
+        </div>
+      </div>
+
+      <!-- Área Central: Pad Vertical com Indicador de Intensidade e Linha Laser -->
+      <div class="gravador-pad-container">
+        <div id="padVibracao" class="pad-intensidade">
+          <div class="pad-intensidade__marcadores">
+            <span class="marcador-nivel marcador-nivel--topo">▲ 100% FORTE (Brilho Intenso)</span>
+            <span class="marcador-nivel marcador-nivel--meio">◆ 50% MÉDIO</span>
+            <span class="marcador-nivel marcador-nivel--base">▼ 15% SUAVE (Asas Leves)</span>
+          </div>
+          <!-- Linha Laser que segue o dedo verticalmente -->
+          <div id="laserIntensidade" class="laser-intensidade" style="display: none;">
+            <span id="laserTexto" class="laser-texto">50%</span>
+          </div>
+          <div class="pad-intensidade__instrucao">
+            <span>Toque e arraste para cima/baixo</span>
+            <small>Mais alto = Mais forte | Mais baixo = Mais suave</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra Inferior: Controles e Ações -->
+      <div class="gravador-hud__footer">
+        <div class="gravador-hud__botoes">
+          <button id="btnIniciarGravacao" class="btn-gravador-acao btn-gravador-acao--gravar" type="button">▶ Gravar com o Vídeo</button>
+          <button id="btnTestarGravacao" class="btn-gravador-acao btn-gravador-acao--testar" type="button" disabled>📳 Sentir Resultado</button>
+          <button id="btnCopiarGravacao" class="btn-gravador-acao btn-gravador-acao--copiar" type="button" disabled>📋 Copiar Padrão</button>
+        </div>
+        <textarea id="txtCodigoGravado" class="gravador-textarea" readonly placeholder="O padrão gravado aparecerá aqui para você copiar..."></textarea>
+      </div>
+    </div>
+  </div>
 
   <!-- Áudio de fundo -->
   <audio id="musica" src="assets/Musica.mp3" loop preload="auto"></audio>
