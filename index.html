@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Convite de Aniversário</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -425,21 +425,31 @@
         </div>
       </div>
 
-      <!-- Área Central: Pad Vertical com Indicador de Intensidade e Linha Laser -->
+      <!-- Área Central: Pad 2D (Eixo Y = Força | Eixo X = Espaçamento/Frequência) -->
       <div class="gravador-pad-container">
         <div id="padVibracao" class="pad-intensidade">
-          <div class="pad-intensidade__marcadores">
-            <span class="marcador-nivel marcador-nivel--topo">▲ 100% FORTE (Brilho Intenso)</span>
-            <span class="marcador-nivel marcador-nivel--meio">◆ 50% MÉDIO</span>
-            <span class="marcador-nivel marcador-nivel--base">▼ 15% SUAVE (Asas Leves)</span>
+          <!-- Marcadores do Eixo Y (Intensidade / Força) -->
+          <div class="pad-eixo-y">
+            <span class="marcador-y marcador-y--topo">▲ FORTE (100%)</span>
+            <span class="marcador-y marcador-y--meio">◆ MÉDIO (50%)</span>
+            <span class="marcador-y marcador-y--base">▼ SUAVE (15%)</span>
           </div>
-          <!-- Linha Laser que segue o dedo verticalmente -->
-          <div id="laserIntensidade" class="laser-intensidade" style="display: none;">
-            <span id="laserTexto" class="laser-texto">50%</span>
+
+          <!-- Marcadores do Eixo X (Espaçamento / Ritmo) -->
+          <div class="pad-eixo-x">
+            <span class="marcador-x marcador-x--esq">◄ LENTO / ESPAÇADO</span>
+            <span class="marcador-x marcador-x--dir">RÁPIDO / DENSO ►</span>
           </div>
+
+          <!-- Cursor 2D / Mira que segue o dedo com dados em tempo real -->
+          <div id="cursor2d" class="cursor-2d" style="display: none;">
+            <div class="cursor-2d__mira"></div>
+            <span id="cursor2dTexto" class="cursor-2d__badge">⚡ 50% | ⏱️ 80ms</span>
+          </div>
+
           <div class="pad-intensidade__instrucao">
-            <span>Toque e arraste para cima/baixo</span>
-            <small>Mais alto = Mais forte | Mais baixo = Mais suave</small>
+            <span>Toque e deslize em 2D ✨</span>
+            <small>Cima/Baixo: Força da Vibração<br>Esquerda/Direita: Espaçamento entre Pulsos</small>
           </div>
         </div>
       </div>
@@ -458,7 +468,7 @@
 
   <!-- Áudio de fundo -->
   <audio id="musica" src="assets/Musica.mp3" loop preload="auto"></audio>
-  <script src="script.js"></script>
+  <script src="script.js?v=3"></script>
 </body>
 
 </html>

@@ -2132,36 +2132,47 @@ body {
   }
 }
 
-/* =========================================================
+/* =========================================
    BOTÃO DE ACESSO AO GRAVADOR NA CAPA
-   ========================================================= */
+   ========================================= */
 .btn-abrir-gravador-capa {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 30;
-  background: rgba(30, 10, 20, 0.85);
-  color: #ffccd8;
-  border: 1.5px solid rgba(255, 180, 200, 0.6);
-  border-radius: 20px;
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 600;
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top, 18px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: linear-gradient(135deg, #e65c83 0%, #a82047 100%);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 28px;
+  padding: 10px 22px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 180, 200, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 22px rgba(230, 92, 131, 0.65);
   pointer-events: auto !important;
   touch-action: manipulation;
-  transition: transform 0.15s ease, background 0.15s ease;
+  animation: pulsarBotaoGravador 2.2s infinite ease-in-out;
 }
 
 .btn-abrir-gravador-capa:active {
-  transform: scale(0.94);
-  background: rgba(60, 20, 40, 0.95);
+  transform: translateX(-50%) scale(0.95);
+  background: #8e1436;
+}
+
+@keyframes pulsarBotaoGravador {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), 0 0 15px rgba(230, 92, 131, 0.5);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 28px rgba(230, 92, 131, 0.9);
+  }
 }
 
 /* =========================================================
@@ -2248,10 +2259,10 @@ body {
   pointer-events: auto;
 }
 
-/* Área Central: Pad Vertical com Altura = Intensidade */
+/* Área Central: Pad 2D com Eixo Y (Força) e Eixo X (Espaçamento) */
 .gravador-pad-container {
   flex: 1;
-  min-height: 220px;
+  min-height: 230px;
   position: relative;
   display: flex;
 }
@@ -2262,52 +2273,64 @@ body {
   position: relative;
   border-radius: 20px;
   border: 2px solid rgba(255, 190, 210, 0.55);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 105, 145, 0.65) 0%,
-    rgba(220, 60, 110, 0.45) 45%,
-    rgba(130, 25, 65, 0.35) 75%,
-    rgba(40, 10, 25, 0.3) 100%
-  );
+  background: 
+    radial-gradient(ellipse at top right, rgba(255, 100, 140, 0.45) 0%, transparent 70%),
+    linear-gradient(
+      180deg,
+      rgba(255, 105, 145, 0.55) 0%,
+      rgba(200, 50, 100, 0.38) 45%,
+      rgba(110, 20, 55, 0.3) 75%,
+      rgba(35, 8, 20, 0.25) 100%
+    );
   box-shadow: inset 0 0 40px rgba(255, 105, 145, 0.2), 0 8px 30px rgba(0, 0, 0, 0.6);
   cursor: crosshair;
   touch-action: none;
   overflow: hidden;
 }
 
-.pad-intensidade__marcadores {
+/* Marcadores do Eixo Y (Vertical = Força) */
+.pad-eixo-y {
   position: absolute;
-  inset: 0;
+  left: 12px;
+  top: 10px;
+  bottom: 28px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 12px 14px;
   pointer-events: none;
+  z-index: 2;
 }
 
-.marcador-nivel {
-  font-size: 11px;
+.marcador-y {
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
-.marcador-nivel--topo {
-  color: #fff0f4;
-  border-top: 1px dashed rgba(255, 255, 255, 0.4);
-  padding-top: 4px;
+.marcador-y--topo { color: #fff0f4; }
+.marcador-y--meio { color: #ffc4d4; }
+.marcador-y--base { color: #e099ad; }
+
+/* Marcadores do Eixo X (Horizontal = Espaçamento) */
+.pad-eixo-x {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 2;
 }
 
-.marcador-nivel--meio {
-  color: #ffc4d4;
-  border-top: 1px dashed rgba(255, 255, 255, 0.25);
-  padding-top: 4px;
-}
-
-.marcador-nivel--base {
-  color: #e099ad;
-  border-top: 1px dashed rgba(255, 255, 255, 0.2);
-  padding-top: 4px;
+.marcador-x {
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffd8e2;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 6px;
+  border-radius: 6px;
 }
 
 .pad-intensidade__instrucao {
@@ -2322,42 +2345,75 @@ body {
   flex-direction: column;
   gap: 4px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  z-index: 1;
 }
 
 .pad-intensidade__instrucao span {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .pad-intensidade__instrucao small {
-  font-size: 11.5px;
+  font-size: 11px;
   color: #ffd8e2;
+  line-height: 1.3;
 }
 
-/* Linha Laser que segue o toque */
-.laser-intensidade {
+/* Mira / Cursor 2D */
+.cursor-2d {
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: #ffffff;
-  box-shadow: 0 0 16px 4px #ff5080, 0 0 30px #ffffff;
   pointer-events: none;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-2d__mira {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 0 20px 4px #ff5080, inset 0 0 12px #ff85a1;
+  position: relative;
+}
+
+.cursor-2d__mira::before,
+.cursor-2d__mira::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.cursor-2d__mira::before {
+  top: 50%;
+  left: -8px;
+  right: -8px;
+  height: 1.5px;
   transform: translateY(-50%);
 }
 
-.laser-texto {
+.cursor-2d__mira::after {
+  left: 50%;
+  top: -8px;
+  bottom: -8px;
+  width: 1.5px;
+  transform: translateX(-50%);
+}
+
+.cursor-2d__badge {
   position: absolute;
-  right: 12px;
-  bottom: 6px;
-  background: rgba(0, 0, 0, 0.75);
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: rgba(15, 4, 12, 0.9);
   border: 1px solid #ff90b0;
-  border-radius: 8px;
-  padding: 2px 8px;
-  font-size: 12px;
+  border-radius: 10px;
+  padding: 3px 8px;
+  font-size: 11px;
   font-weight: 700;
   color: #fff;
   font-family: ui-monospace, monospace;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 /* Barra Inferior */

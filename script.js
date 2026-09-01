@@ -691,14 +691,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================
-  // ESTÚDIO / GRAVADOR TÁTIL COM INTENSIDADE VERTICAL
+  // ESTÚDIO / GRAVADOR TÁTIL 2D (INTENSIDADE & ESPAÇAMENTO)
   // =========================================
   const btnAbrirGravadorCapa = document.getElementById("btnAbrirGravadorCapa");
   const gravadorTatel = document.getElementById("gravadorTatel");
   const btnFecharGravador = document.getElementById("btnFecharGravador");
   const padVibracao = document.getElementById("padVibracao");
-  const laserIntensidade = document.getElementById("laserIntensidade");
-  const laserTexto = document.getElementById("laserTexto");
+  const cursor2d = document.getElementById("cursor2d");
+  const cursor2dTexto = document.getElementById("cursor2dTexto");
   const badgeIntensidade = document.getElementById("badgeIntensidade");
   const tempoGravador = document.getElementById("tempoGravador");
   const btnIniciarGravacao = document.getElementById("btnIniciarGravacao");
@@ -709,10 +709,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let gravando = false;
   let gravacaoInicio = 0;
   let gravadorTimerId = null;
-  let amostrasGravadas = [];
+  let pulsosGravados = []; // Array de { time, onMs, offMs }
   let toqueAtivo = false;
-  let intensidadeAtual = 0.5;
-  let loopVibracaoPwm = null;
+  let intensidadeAtual = 0.5; // 0.12 a 1.0
+  let espacamentoAtual = 80;   // 15ms a 260ms
+  let timerProximoPulso = null;
 
   function abrirGravador() {
     if (!gravadorTatel) return;
@@ -735,92 +736,128 @@ document.addEventListener("DOMContentLoaded", () => {
     pararVibracao();
   }
 
-  if (btnAbrirGravadorCapa) btnAbrirGravadorCapa.addEventListener("click", abrirGravador);
-  if (btnFecharGravador) btnFecharGravador.addEventListener("click", fecharGravador);
+  if (btnAbrirGravadorCapa) {
+    btnAbrirGravadorCapa.addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      abrirGravador();
+    });
+    btnAbrirGravadorCapa.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+    });
+  }
+
+  if (btnFecharGravador) {
+    btnFecharGravador.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fecharGravador();
+    });
+  }
+
+  window.addEventListener("hashchange", () => {
+    if (window.location.hash.includes("gravador")) {
+      abrirGravador();
+    }
+  });
 
   if (window.location.hash.includes("gravador") || window.location.search.includes("gravador")) {
     abrirGravador();
   }
 
-  // Síntese PWM de Intensidade Tátil em Tempo Real
-  function iniciarLoopPwm() {
-    if (loopVibracaoPwm) clearInterval(loopVibracaoPwm);
-    loopVibracaoPwm = setInterval(() => {
-      if (!toqueAtivo) {
-        pararVibracao();
-        return;
-      }
-      const periodo = 28;
-      const msLigado = Math.max(4, Math.round(periodo * intensidadeAtual));
-      const msPausa = Math.max(0, periodo - msLigado);
-      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-        try {
-          if (msPausa === 0) navigator.vibrate(periodo);
-          else navigator.vibrate([msLigado, msPausa]);
-        } catch (e) {}
-      }
-    }, 28);
-  }
+  // Executa um pulso tátil e agenda o próximo com base no espaçamento (X) e intensidade (Y)
+  function dispararPulso2D() {
+    if (!toqueAtivo) return;
 
-  function pararLoopPwm() {
-    if (loopVibracaoPwm) {
-      clearInterval(loopVibracaoPwm);
-      loopVibracaoPwm = null;
-    }
-    pararVibracao();
-  }
+    const duracaoPulso = Math.max(10, Math.round(12 + intensidadeAtual * 36));
+    const pausa = Math.max(12, espacamentoAtual);
 
-  // Quanto mais alto o toque no painel, mais intensa a vibração
-  function atualizarPosicaoToque(e) {
-    if (!padVibracao) return;
-    const rect = padVibracao.getBoundingClientRect();
-    const clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
-    const relY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-
-    const pct = Math.round((1 - relY) * 100);
-    intensidadeAtual = 0.12 + (1 - relY) * 0.88;
-
-    if (laserIntensidade) {
-      laserIntensidade.style.display = "block";
-      laserIntensidade.style.top = `${relY * 100}%`;
-    }
-    if (laserTexto) {
-      laserTexto.textContent = `${pct}% ${pct > 70 ? '🔥 FORTE' : pct > 35 ? '⚡ MÉDIO' : '🍃 SUAVE'}`;
-    }
-    if (badgeIntensidade) {
-      badgeIntensidade.textContent = `⚡ Força: ${pct}%`;
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(duracaoPulso);
+      } catch (e) {}
     }
 
     if (gravando) {
       const decorrido = Math.round(performance.now() - gravacaoInicio);
-      amostrasGravadas.push({ time: decorrido, intensity: intensidadeAtual, active: true });
+      pulsosGravados.push({
+        time: decorrido,
+        onMs: duracaoPulso,
+        offMs: pausa
+      });
     }
+
+    const intervaloTotal = duracaoPulso + pausa;
+    timerProximoPulso = setTimeout(() => {
+      if (toqueAtivo) {
+        dispararPulso2D();
+      }
+    }, intervaloTotal);
+  }
+
+  function iniciarCicloVibracao2D() {
+    if (timerProximoPulso) clearTimeout(timerProximoPulso);
+    dispararPulso2D();
+  }
+
+  function pararCicloVibracao2D() {
+    if (timerProximoPulso) {
+      clearTimeout(timerProximoPulso);
+      timerProximoPulso = null;
+    }
+    pararVibracao();
+  }
+
+  // Rastreamento Bidimensional: Y = Força | X = Espaçamento
+  function atualizarPosicao2D(e) {
+    if (!padVibracao) return;
+    const rect = padVibracao.getBoundingClientRect();
+    const clientX = e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
+
+    const relX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const relY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+
+    // Eixo Y: Topo = 100% Forte, Base = 15% Suave
+    const pctY = Math.round((1 - relY) * 100);
+    intensidadeAtual = 0.12 + (1 - relY) * 0.88;
+
+    // Eixo X: Esquerda = 250ms (Espaçado), Direita = 15ms (Rápido)
+    espacamentoAtual = Math.round(250 - relX * 235);
+
+    // Posiciona a Mira 2D
+    if (cursor2d) {
+      cursor2d.style.display = "block";
+      cursor2d.style.left = `${relX * 100}%`;
+      cursor2d.style.top = `${relY * 100}%`;
+    }
+
+    const rotuloRitmo = espacamentoAtual > 140 ? 'Lento' : espacamentoAtual > 60 ? 'Médio' : 'Rápido';
+    const textoInfo = `⚡ ${pctY}% | ⏱️ ${espacamentoAtual}ms (${rotuloRitmo})`;
+
+    if (cursor2dTexto) cursor2dTexto.textContent = textoInfo;
+    if (badgeIntensidade) badgeIntensidade.textContent = textoInfo;
   }
 
   if (padVibracao) {
     const aoIniciarToque = (e) => {
       e.preventDefault();
       toqueAtivo = true;
-      atualizarPosicaoToque(e);
-      iniciarLoopPwm();
+      atualizarPosicao2D(e);
+      iniciarCicloVibracao2D();
     };
 
     const aoMoverToque = (e) => {
       if (!toqueAtivo) return;
       e.preventDefault();
-      atualizarPosicaoToque(e);
+      atualizarPosicao2D(e);
     };
 
     const aoEncerrarToque = (e) => {
       e.preventDefault();
       toqueAtivo = false;
-      pararLoopPwm();
-      if (laserIntensidade) laserIntensidade.style.display = "none";
+      pararCicloVibracao2D();
+      if (cursor2d) cursor2d.style.display = "none";
       if (badgeIntensidade) badgeIntensidade.textContent = "⚡ Toque no painel";
-      if (gravando) {
-        const decorrido = Math.round(performance.now() - gravacaoInicio);
-        amostrasGravadas.push({ time: decorrido, intensity: 0, active: false });
-      }
     };
 
     padVibracao.addEventListener("pointerdown", aoIniciarToque);
@@ -839,13 +876,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function iniciarGravacao() {
     gravando = true;
-    amostrasGravadas = [];
+    pulsosGravados = [];
     toqueAtivo = false;
     gravacaoInicio = performance.now();
     btnIniciarGravacao.textContent = "⏹ Parar";
     btnTestarGravacao.disabled = true;
     btnCopiarGravacao.disabled = true;
-    txtCodigoGravado.value = "Gravando ritmo e intensidade... Toque e deslize o dedo para cima e para baixo!";
+    txtCodigoGravado.value = "Gravando... Deslize em 2D: Cima/Baixo (Força) e Esquerda/Direita (Espaçamento)!";
 
     if (video) {
       video.currentTime = 0;
@@ -861,65 +898,27 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 30);
   }
 
-  function compilarAmostrasEmPadraoPwm(amostras, duracaoTotal) {
-    if (!amostras || amostras.length === 0) return [];
+  // Compila os pulsos e pausas da linha do tempo no array exato [on, off, on, off...]
+  function compilarPulsosEmPadrao(pulsos) {
+    if (!pulsos || pulsos.length === 0) return [];
     
-    const blocoMs = 30;
-    const qtdBlocos = Math.ceil(duracaoTotal / blocoMs);
-    const pulsos = [];
-    let ponteiroAmostra = 0;
-
-    for (let b = 0; b < qtdBlocos; b++) {
-      const tInicio = b * blocoMs;
-      const tFim = tInicio + blocoMs;
-
-      let somaIntensidade = 0;
-      let count = 0;
-      let ativo = false;
-
-      while (ponteiroAmostra < amostras.length && amostras[ponteiroAmostra].time <= tFim) {
-        if (amostras[ponteiroAmostra].active) {
-          somaIntensidade += amostras[ponteiroAmostra].intensity;
-          count++;
-          ativo = true;
-        } else {
-          ativo = false;
-        }
-        ponteiroAmostra++;
-      }
-
-      if (ativo && count > 0) {
-        const intensidadeMedia = somaIntensidade / count;
-        const on = Math.max(4, Math.round(blocoMs * intensidadeMedia));
-        const off = blocoMs - on;
-        pulsos.push({ on, off });
-      } else {
-        pulsos.push({ on: 0, off: blocoMs });
-      }
-    }
-
     const arrayFinal = [];
-    let pausaAcumulada = 0;
+    let tempoAtual = 0;
 
     for (let i = 0; i < pulsos.length; i++) {
       const p = pulsos[i];
-      if (p.on === 0) {
-        pausaAcumulada += p.off;
-      } else {
-        if (pausaAcumulada > 0) {
-          if (arrayFinal.length === 0) {
-            arrayFinal.push(0);
-            arrayFinal.push(pausaAcumulada);
-          } else {
-            arrayFinal.push(pausaAcumulada);
-          }
-          pausaAcumulada = 0;
-        }
-        arrayFinal.push(p.on);
-        if (p.off > 0) {
-          pausaAcumulada += p.off;
-        }
+      const tempoInicioPulso = p.time;
+      const pausaAntes = tempoInicioPulso - tempoAtual;
+
+      if (tempoAtual === 0 && tempoInicioPulso > 0) {
+        arrayFinal.push(0);
+        arrayFinal.push(tempoInicioPulso);
+      } else if (pausaAntes > 0) {
+        arrayFinal.push(pausaAntes);
       }
+
+      arrayFinal.push(p.onMs);
+      tempoAtual = tempoInicioPulso + p.onMs;
     }
 
     return arrayFinal;
@@ -929,17 +928,16 @@ document.addEventListener("DOMContentLoaded", () => {
     gravando = false;
     if (gravadorTimerId) clearInterval(gravadorTimerId);
     btnIniciarGravacao.textContent = "▶ Gravar com o Vídeo";
-    pararLoopPwm();
+    pararCicloVibracao2D();
     if (video) video.pause();
 
-    const decorrido = Math.round(performance.now() - gravacaoInicio);
-    const padraoPwm = compilarAmostrasEmPadraoPwm(amostrasGravadas, decorrido);
+    const padraoCompilado = compilarPulsosEmPadrao(pulsosGravados);
 
-    if (padraoPwm.length > 0) {
+    if (padraoCompilado.length > 0) {
       btnTestarGravacao.disabled = false;
       btnCopiarGravacao.disabled = false;
-      txtCodigoGravado.value = JSON.stringify(padraoPwm);
-      exibirToast("Gravação com intensidade concluída! Pronto para testar 📳");
+      txtCodigoGravado.value = JSON.stringify(padraoCompilado);
+      exibirToast("Gravação 2D concluída! Pronto para testar 📳");
     } else {
       txtCodigoGravado.value = "Nenhum toque foi registrado. Clique em Gravar e toque no painel!";
     }
