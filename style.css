@@ -3,6 +3,26 @@
   padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+img,
+video,
+canvas,
+svg {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
 }
 
 html,
@@ -2110,166 +2130,4 @@ body {
     height: 62px;
     opacity: .72;
   }
-}
-
-/* =========================================================
-   ESTÚDIO / GRAVADOR DE VIBRAÇÃO TÁTIL (#gravador)
-   ========================================================= */
-.gravador-tatel {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  background: rgba(10, 4, 8, 0.94);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  color: #fff;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-
-.gravador-card {
-  width: 100%;
-  max-width: 380px;
-  background: linear-gradient(180deg, #240f19 0%, #150710 100%);
-  border: 1.5px solid rgba(235, 165, 185, 0.5);
-  border-radius: 24px;
-  padding: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(235, 165, 185, 0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 92dvh;
-  overflow-y: auto;
-}
-
-.gravador-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.gravador-header h3 {
-  font-size: 16px;
-  color: #f7cad5;
-  margin: 0;
-}
-
-.btn-fechar-gravador {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: #fff;
-  font-size: 22px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: grid;
-  place-items: center;
-}
-
-.gravador-desc {
-  font-size: 12px;
-  color: #d8b4c0;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.gravador-tempo {
-  text-align: center;
-  font-size: 26px;
-  font-family: ui-monospace, monospace;
-  font-weight: 700;
-  color: #ff9ebb;
-  letter-spacing: 1px;
-}
-
-.pad-vibracao {
-  width: 100%;
-  min-height: 110px;
-  background: linear-gradient(135deg, #ed9cb0 0%, #cf637d 100%);
-  border: 2px solid #ffccd8;
-  border-radius: 20px;
-  color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(207, 99, 125, 0.4);
-  touch-action: none;
-  user-select: none;
-  transition: transform 0.1s ease, filter 0.1s ease;
-}
-
-.pad-vibracao:active,
-.pad-vibracao.ativo {
-  transform: scale(0.96);
-  filter: brightness(1.2);
-  background: linear-gradient(135deg, #ffb4c5 0%, #e2758f 100%);
-  box-shadow: 0 0 30px rgba(255, 180, 200, 0.8);
-}
-
-.pad-vibracao span {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.pad-vibracao small {
-  font-size: 12px;
-  opacity: 0.85;
-}
-
-.gravador-acoes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.btn-gravador-acao {
-  padding: 10px 8px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: #381a25;
-  color: #fff;
-  font-weight: 600;
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
-}
-
-.btn-gravador-acao:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.btn-gravador-acao--copiar {
-  grid-column: span 2;
-  background: #63233b;
-  border-color: #f7cad5;
-  color: #fff;
-}
-
-.gravador-resultado label {
-  font-size: 11px;
-  text-transform: uppercase;
-  color: #d8b4c0;
-  margin-bottom: 4px;
-  display: block;
-}
-
-.gravador-resultado textarea {
-  width: 100%;
-  height: 65px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  color: #a3f7bf;
-  font-family: ui-monospace, monospace;
-  font-size: 11px;
-  padding: 8px;
-  resize: none;
 }
