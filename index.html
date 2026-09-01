@@ -407,6 +407,37 @@
 
   <div id="toast" role="status" aria-live="polite"></div>
 
+  <!-- Painel Estúdio / Gravador de Vibração Tátil (Aberto via #gravador ou triplo-clique) -->
+  <div id="gravadorTatel" class="gravador-tatel" style="display: none;">
+    <div class="gravador-card">
+      <div class="gravador-header">
+        <h3>🎙️ Gravador de Vibração Tátil</h3>
+        <button id="btnFecharGravador" class="btn-fechar-gravador" aria-label="Fechar gravador">&times;</button>
+      </div>
+      <p class="gravador-desc">Toque e segure no botão abaixo no ritmo do vídeo. O celular vibrará em tempo real e calculará o padrão exato para você copiar!</p>
+      
+      <div class="gravador-tempo">
+        <span id="tempoGravador">00:00.000</span>
+      </div>
+
+      <button id="btnPadVibracao" class="pad-vibracao" type="button">
+        <span>Toque & Segure no Ritmo ✨</span>
+        <small>Mantenha pressionado para vibrar</small>
+      </button>
+
+      <div class="gravador-acoes">
+        <button id="btnIniciarGravacao" class="btn-gravador-acao" type="button">▶ Iniciar com o Vídeo</button>
+        <button id="btnTestarGravacao" class="btn-gravador-acao btn-gravador-acao--secundario" type="button" disabled>📳 Sentir Resultado</button>
+        <button id="btnCopiarGravacao" class="btn-gravador-acao btn-gravador-acao--copiar" type="button" disabled>📋 Copiar Padrão Gerado</button>
+      </div>
+
+      <div class="gravador-resultado">
+        <label>Padrão Gerado (Array para aplicar):</label>
+        <textarea id="txtCodigoGravado" readonly placeholder="O código em array aparecerá aqui..."></textarea>
+      </div>
+    </div>
+  </div>
+
   <!-- Áudio de fundo -->
   <audio id="musica" src="assets/Musica.mp3" loop preload="auto"></audio>
   <script src="script.js"></script>

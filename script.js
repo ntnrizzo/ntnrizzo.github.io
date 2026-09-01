@@ -184,12 +184,51 @@ document.addEventListener("DOMContentLoaded", () => {
     requestAnimationFrame(animar);
   }
 
-  // Abertura do convite com transição suave e áudio
+  // =========================================
+  // PADRÃO TÁTIL CINEMATOGRÁFICO DOS VAGALUMES
+  // =========================================
+  // 0s a 3s: Bater de asas suave e alternado
+  // 3s a 4s: Aceleração do bater de asas
+  // 4s a 6s: Pausa / Silêncio
+  // 6s a 8s: Crescendo de brilho mágico cintilante
+  const padraoVagalumesVideo = [
+    // 0s a 3s (asas alternadas)
+    18, 130, 14, 160, 22, 140, 16, 150, 20, 130, 14, 160, 22, 140, 18, 150, 16, 140, 20, 150, 14, 160, 22, 140, 18, 150,
+    // 3s a 4s (aceleração)
+    15, 65, 18, 70, 15, 60, 20, 65, 15, 70, 18, 65, 15, 60, 22, 70,
+    // 4s a 6s (pausa de aprox. 2s)
+    0, 1900,
+    // 6s a 8s (brilho subindo em crescendo)
+    12, 130, 15, 100, 18, 80, 22, 65, 26, 50, 32, 40, 40, 30, 55, 20, 80, 15, 140
+  ];
+
+  function iniciarExperienciaTatelVagalumes() {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(padraoVagalumesVideo);
+      } catch (e) {
+        console.warn("Vibração tátil não suportada neste dispositivo:", e);
+      }
+    }
+  }
+
+  function pararVibracao() {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(0);
+      } catch (e) {}
+    }
+  }
+
+  // Abertura do convite com transição suave, áudio e experiência tátil
   btnAbrir.addEventListener("click", async () => {
     capa.style.opacity = "0";
     setTimeout(() => {
       capa.style.display = "none";
     }, 500);
+
+    // Inicia a sinfonia tátil dos vagalumes sincronizada
+    iniciarExperienciaTatelVagalumes();
 
     try {
       video.muted = false;
@@ -261,6 +300,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
+      pararVibracao();
       if (musica && !musica.paused) {
         audioEstavaTocando = true;
         musica.pause();
@@ -281,9 +321,203 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("pagehide", () => {
+    pararVibracao();
     if (musica) musica.pause();
     if (video) video.pause();
   });
+
+  // =========================================
+  // CONTROLADOR DO GRAVADOR / ESTÚDIO TÁTIL (#gravador)
+  // =========================================
+  const gravadorTatel = document.getElementById("gravadorTatel");
+  const btnFecharGravador = document.getElementById("btnFecharGravador");
+  const btnPadVibracao = document.getElementById("btnPadVibracao");
+  const btnIniciarGravacao = document.getElementById("btnIniciarGravacao");
+  const btnTestarGravacao = document.getElementById("btnTestarGravacao");
+  const btnCopiarGravacao = document.getElementById("btnCopiarGravacao");
+  const tempoGravador = document.getElementById("tempoGravador");
+  const txtCodigoGravado = document.getElementById("txtCodigoGravado");
+
+  let gravando = false;
+  let gravacaoInicio = 0;
+  let eventosVibracao = [];
+  let padPressionado = false;
+  let gravadorTimerId = null;
+
+  function abrirGravador() {
+    if (!gravadorTatel) return;
+    gravadorTatel.style.display = "flex";
+  }
+
+  function fecharGravador() {
+    if (!gravadorTatel) return;
+    gravadorTatel.style.display = "none";
+    if (gravando) pararGravacao();
+  }
+
+  // Abre automaticamente se a URL tiver #gravador ou ?gravador
+  if (window.location.hash.includes("gravador") || window.location.search.includes("gravador")) {
+    abrirGravador();
+  }
+
+  // Atalho secreto: 4 toques rápidos em qualquer lugar da capa abrem o estúdio
+  let toquesAtalho = 0;
+  let timerAtalho = null;
+  document.addEventListener("click", () => {
+    toquesAtalho++;
+    if (timerAtalho) clearTimeout(timerAtalho);
+    timerAtalho = setTimeout(() => { toquesAtalho = 0; }, 1200);
+    if (toquesAtalho >= 4) {
+      toquesAtalho = 0;
+      abrirGravador();
+    }
+  });
+
+  if (btnFecharGravador) btnFecharGravador.addEventListener("click", fecharGravador);
+
+  function formatarTempoMs(ms) {
+    const min = Math.floor(ms / 60000);
+    const sec = Math.floor((ms % 60000) / 1000);
+    const msec = ms % 1000;
+    return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(msec).padStart(3, '0')}`;
+  }
+
+  function iniciarGravacao() {
+    gravando = true;
+    eventosVibracao = [];
+    padPressionado = false;
+    gravacaoInicio = performance.now();
+    btnIniciarGravacao.textContent = "⏹ Parar Gravação";
+    btnTestarGravacao.disabled = true;
+    btnCopiarGravacao.disabled = true;
+    txtCodigoGravado.value = "Gravando ritmo... Toque e segure no botão grande!";
+
+    // Reinicia o vídeo no fundo para você acompanhar visualmente
+    if (video) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    }
+
+    gravadorTimerId = setInterval(() => {
+      const decorrido = Math.round(performance.now() - gravacaoInicio);
+      if (tempoGravador) tempoGravador.textContent = formatarTempoMs(decorrido);
+      if (decorrido >= 18000) {
+        pararGravacao();
+      }
+    }, 30);
+  }
+
+  function pararGravacao() {
+    gravando = false;
+    if (gravadorTimerId) clearInterval(gravadorTimerId);
+    btnIniciarGravacao.textContent = "▶ Iniciar Gravação";
+    pararVibracao();
+
+    if (padPressionado) {
+      eventosVibracao.push({ time: Math.round(performance.now() - gravacaoInicio), type: "end" });
+      padPressionado = false;
+    }
+
+    const arrayPadrao = compilarEventosEmPadrao(eventosVibracao);
+    if (arrayPadrao.length > 0) {
+      btnTestarGravacao.disabled = false;
+      btnCopiarGravacao.disabled = false;
+      txtCodigoGravado.value = JSON.stringify(arrayPadrao);
+      exibirToast("Gravação concluída! Pronto para testar 📳");
+    } else {
+      txtCodigoGravado.value = "Nenhum toque foi registrado. Clique em Iniciar e segure o botão!";
+    }
+  }
+
+  function compilarEventosEmPadrao(eventos) {
+    if (eventos.length === 0) return [];
+    const padrao = [];
+    let tempoAtual = 0;
+
+    for (let i = 0; i < eventos.length; i++) {
+      const ev = eventos[i];
+      if (ev.type === "start") {
+        const pausaAntes = ev.time - tempoAtual;
+        if (tempoAtual === 0 && ev.time > 0) {
+          padrao.push(0);
+          padrao.push(pausaAntes);
+        } else if (pausaAntes > 0 && padrao.length > 0) {
+          padrao.push(pausaAntes);
+        }
+        tempoAtual = ev.time;
+      } else if (ev.type === "end") {
+        const duracaoVibracao = Math.max(10, ev.time - tempoAtual);
+        padrao.push(duracaoVibracao);
+        tempoAtual = ev.time;
+      }
+    }
+    return padrao;
+  }
+
+  if (btnIniciarGravacao) {
+    btnIniciarGravacao.addEventListener("click", () => {
+      if (gravando) pararGravacao();
+      else iniciarGravacao();
+    });
+  }
+
+  if (btnPadVibracao) {
+    const aoPressionarPad = (e) => {
+      e.preventDefault();
+      btnPadVibracao.classList.add("ativo");
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        try { navigator.vibrate(5000); } catch (err) {}
+      }
+      if (gravando && !padPressionado) {
+        padPressionado = true;
+        eventosVibracao.push({ time: Math.round(performance.now() - gravacaoInicio), type: "start" });
+      }
+    };
+
+    const aoSoltarPad = (e) => {
+      e.preventDefault();
+      btnPadVibracao.classList.remove("ativo");
+      pararVibracao();
+      if (gravando && padPressionado) {
+        padPressionado = false;
+        eventosVibracao.push({ time: Math.round(performance.now() - gravacaoInicio), type: "end" });
+      }
+    };
+
+    btnPadVibracao.addEventListener("pointerdown", aoPressionarPad);
+    btnPadVibracao.addEventListener("pointerup", aoSoltarPad);
+    btnPadVibracao.addEventListener("pointerleave", aoSoltarPad);
+    btnPadVibracao.addEventListener("pointercancel", aoSoltarPad);
+  }
+
+  if (btnTestarGravacao) {
+    btnTestarGravacao.addEventListener("click", () => {
+      try {
+        const padrao = JSON.parse(txtCodigoGravado.value);
+        if (Array.isArray(padrao) && navigator.vibrate) {
+          navigator.vibrate(padrao);
+          exibirToast("Sentindo a vibração gravada... ✨");
+        }
+      } catch (err) {
+        exibirToast("Erro ao ler o padrão gravado.");
+      }
+    });
+  }
+
+  if (btnCopiarGravacao) {
+    btnCopiarGravacao.addEventListener("click", async () => {
+      if (txtCodigoGravado.value) {
+        try {
+          await navigator.clipboard.writeText(txtCodigoGravado.value);
+          exibirToast("Padrão copiado com sucesso! 📋");
+        } catch (err) {
+          txtCodigoGravado.select();
+          document.execCommand("copy");
+          exibirToast("Padrão copiado! 📋");
+        }
+      }
+    });
+  }
 
   // =========================================
   // SISTEMA DE VAGALUMES MÁGICOS NOS MODAIS
