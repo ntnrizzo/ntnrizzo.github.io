@@ -188,8 +188,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // PADRÃO TÁTIL PERSONALIZADO (GRAVADO PELO USUÁRIO)
   // =========================================
   const padraoVagalumesVideo = [
-    0, 352, 135, 152, 456, 124, 108, 106, 78, 64, 368, 146, 422, 110, 99, 82, 351,
-    111, 159, 121, 216, 111, 105, 120, 79, 105, 73, 70, 288, 1673, 1553, 2991, 111, 89, 104
+    0, 802, 25, 142, 28, 144, 32, 130, 30, 120, 28, 111, 26, 84, 26, 76, 24, 71,
+    22, 77, 22, 94, 24, 113, 25, 125, 27, 135, 29, 151, 29, 170, 33, 166, 38, 152,
+    38, 117, 32, 84, 30, 70, 29, 58, 27, 55, 23, 67, 22, 80, 24, 86, 25, 63, 27,
+    47, 29, 47, 32, 38, 34, 32, 36, 27, 37, 24, 39, 31, 43, 24, 46, 24, 48, 27,
+    48, 31, 48, 36, 48, 44, 48, 55, 48, 59, 47, 86, 46, 108, 43, 135, 40, 148, 36,
+    164, 33, 177, 28, 183, 24, 186, 24, 95, 26, 65, 30, 47, 33, 40, 36, 32, 38,
+    31, 41, 32, 44, 33, 46, 35, 48, 42, 48, 63, 48, 89, 48, 115, 48, 134, 47, 165,
+    45, 178, 41, 189, 37, 196, 34, 206, 30, 213, 27, 227, 24, 232, 22, 245, 20,
+    241, 19, 249, 17, 250, 16, 250, 16, 250, 16, 250, 16
   ];
 
   function iniciarExperienciaTatelVagalumes() {
@@ -691,296 +698,34 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================
-  // ESTÚDIO / GRAVADOR TÁTIL 2D (INTENSIDADE & ESPAÇAMENTO)
+  // PROTEÇÃO CONTRA CÓPIA, SALVAR E INSPEÇÃO
   // =========================================
-  const btnAbrirGravadorCapa = document.getElementById("btnAbrirGravadorCapa");
-  const gravadorTatel = document.getElementById("gravadorTatel");
-  const btnFecharGravador = document.getElementById("btnFecharGravador");
-  const padVibracao = document.getElementById("padVibracao");
-  const cursor2d = document.getElementById("cursor2d");
-  const cursor2dTexto = document.getElementById("cursor2dTexto");
-  const badgeIntensidade = document.getElementById("badgeIntensidade");
-  const tempoGravador = document.getElementById("tempoGravador");
-  const btnIniciarGravacao = document.getElementById("btnIniciarGravacao");
-  const btnTestarGravacao = document.getElementById("btnTestarGravacao");
-  const btnCopiarGravacao = document.getElementById("btnCopiarGravacao");
-  const txtCodigoGravado = document.getElementById("txtCodigoGravado");
+  // Desativa menu de contexto (botão direito e segurar o dedo no celular para salvar imagem)
+  document.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+  }, { passive: false });
 
-  let gravando = false;
-  let gravacaoInicio = 0;
-  let gravadorTimerId = null;
-  let pulsosGravados = []; // Array de { time, onMs, offMs }
-  let toqueAtivo = false;
-  let intensidadeAtual = 0.5; // 0.12 a 1.0
-  let espacamentoAtual = 80;   // 15ms a 260ms
-  let timerProximoPulso = null;
+  // Desativa arrastar imagens e vídeos
+  document.addEventListener("dragstart", (e) => {
+    e.preventDefault();
+  }, { passive: false });
 
-  function abrirGravador() {
-    if (!gravadorTatel) return;
-    gravadorTatel.style.display = "flex";
-    if (capa) capa.style.display = "none";
-    if (video) {
-      video.pause();
-      video.currentTime = 0;
-    }
-  }
-
-  function fecharGravador() {
-    if (!gravadorTatel) return;
-    gravadorTatel.style.display = "none";
-    if (gravando) pararGravacao();
-    if (capa) {
-      capa.style.display = "";
-      capa.style.opacity = "1";
-    }
-    pararVibracao();
-  }
-
-  if (btnAbrirGravadorCapa) {
-    btnAbrirGravadorCapa.addEventListener("click", (e) => {
-      e.stopPropagation();
+  // Desativa seleção acidental de elementos
+  document.addEventListener("selectstart", (e) => {
+    if (e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
       e.preventDefault();
-      abrirGravador();
-    });
-    btnAbrirGravadorCapa.addEventListener("pointerdown", (e) => {
-      e.stopPropagation();
-    });
-  }
+    }
+  }, { passive: false });
 
-  if (btnFecharGravador) {
-    btnFecharGravador.addEventListener("click", (e) => {
-      e.stopPropagation();
-      fecharGravador();
-    });
-  }
-
-  window.addEventListener("hashchange", () => {
-    if (window.location.hash.includes("gravador")) {
-      abrirGravador();
+  // Bloqueia atalhos comuns de inspeção e salvamento (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I)
+  document.addEventListener("keydown", (e) => {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c")) ||
+      (e.ctrlKey && (e.key === "U" || e.key === "u" || e.key === "S" || e.key === "s"))
+    ) {
+      e.preventDefault();
     }
   });
-
-  if (window.location.hash.includes("gravador") || window.location.search.includes("gravador")) {
-    abrirGravador();
-  }
-
-  // Executa um pulso tátil e agenda o próximo com base no espaçamento (X) e intensidade (Y)
-  function dispararPulso2D() {
-    if (!toqueAtivo) return;
-
-    const duracaoPulso = Math.max(10, Math.round(12 + intensidadeAtual * 36));
-    const pausa = Math.max(12, espacamentoAtual);
-
-    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-      try {
-        navigator.vibrate(duracaoPulso);
-      } catch (e) {}
-    }
-
-    if (gravando) {
-      const decorrido = Math.round(performance.now() - gravacaoInicio);
-      pulsosGravados.push({
-        time: decorrido,
-        onMs: duracaoPulso,
-        offMs: pausa
-      });
-    }
-
-    const intervaloTotal = duracaoPulso + pausa;
-    timerProximoPulso = setTimeout(() => {
-      if (toqueAtivo) {
-        dispararPulso2D();
-      }
-    }, intervaloTotal);
-  }
-
-  function iniciarCicloVibracao2D() {
-    if (timerProximoPulso) clearTimeout(timerProximoPulso);
-    dispararPulso2D();
-  }
-
-  function pararCicloVibracao2D() {
-    if (timerProximoPulso) {
-      clearTimeout(timerProximoPulso);
-      timerProximoPulso = null;
-    }
-    pararVibracao();
-  }
-
-  // Rastreamento Bidimensional: Y = Força | X = Espaçamento
-  function atualizarPosicao2D(e) {
-    if (!padVibracao) return;
-    const rect = padVibracao.getBoundingClientRect();
-    const clientX = e.touches && e.touches[0] ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches && e.touches[0] ? e.touches[0].clientY : e.clientY;
-
-    const relX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const relY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
-
-    // Eixo Y: Topo = 100% Forte, Base = 15% Suave
-    const pctY = Math.round((1 - relY) * 100);
-    intensidadeAtual = 0.12 + (1 - relY) * 0.88;
-
-    // Eixo X: Esquerda = 250ms (Espaçado), Direita = 15ms (Rápido)
-    espacamentoAtual = Math.round(250 - relX * 235);
-
-    // Posiciona a Mira 2D
-    if (cursor2d) {
-      cursor2d.style.display = "block";
-      cursor2d.style.left = `${relX * 100}%`;
-      cursor2d.style.top = `${relY * 100}%`;
-    }
-
-    const rotuloRitmo = espacamentoAtual > 140 ? 'Lento' : espacamentoAtual > 60 ? 'Médio' : 'Rápido';
-    const textoInfo = `⚡ ${pctY}% | ⏱️ ${espacamentoAtual}ms (${rotuloRitmo})`;
-
-    if (cursor2dTexto) cursor2dTexto.textContent = textoInfo;
-    if (badgeIntensidade) badgeIntensidade.textContent = textoInfo;
-  }
-
-  if (padVibracao) {
-    const aoIniciarToque = (e) => {
-      e.preventDefault();
-      toqueAtivo = true;
-      atualizarPosicao2D(e);
-      iniciarCicloVibracao2D();
-    };
-
-    const aoMoverToque = (e) => {
-      if (!toqueAtivo) return;
-      e.preventDefault();
-      atualizarPosicao2D(e);
-    };
-
-    const aoEncerrarToque = (e) => {
-      e.preventDefault();
-      toqueAtivo = false;
-      pararCicloVibracao2D();
-      if (cursor2d) cursor2d.style.display = "none";
-      if (badgeIntensidade) badgeIntensidade.textContent = "⚡ Toque no painel";
-    };
-
-    padVibracao.addEventListener("pointerdown", aoIniciarToque);
-    padVibracao.addEventListener("pointermove", aoMoverToque);
-    padVibracao.addEventListener("pointerup", aoEncerrarToque);
-    padVibracao.addEventListener("pointercancel", aoEncerrarToque);
-    padVibracao.addEventListener("pointerleave", aoEncerrarToque);
-  }
-
-  function formatarTempoMs(ms) {
-    const min = Math.floor(ms / 60000);
-    const sec = Math.floor((ms % 60000) / 1000);
-    const msec = ms % 1000;
-    return `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(msec).padStart(3, '0')}`;
-  }
-
-  function iniciarGravacao() {
-    gravando = true;
-    pulsosGravados = [];
-    toqueAtivo = false;
-    gravacaoInicio = performance.now();
-    btnIniciarGravacao.textContent = "⏹ Parar";
-    btnTestarGravacao.disabled = true;
-    btnCopiarGravacao.disabled = true;
-    txtCodigoGravado.value = "Gravando... Deslize em 2D: Cima/Baixo (Força) e Esquerda/Direita (Espaçamento)!";
-
-    if (video) {
-      video.currentTime = 0;
-      video.play().catch(() => {});
-    }
-
-    gravadorTimerId = setInterval(() => {
-      const decorrido = Math.round(performance.now() - gravacaoInicio);
-      if (tempoGravador) tempoGravador.textContent = formatarTempoMs(decorrido);
-      if (decorrido >= 18000) {
-        pararGravacao();
-      }
-    }, 30);
-  }
-
-  // Compila os pulsos e pausas da linha do tempo no array exato [on, off, on, off...]
-  function compilarPulsosEmPadrao(pulsos) {
-    if (!pulsos || pulsos.length === 0) return [];
-    
-    const arrayFinal = [];
-    let tempoAtual = 0;
-
-    for (let i = 0; i < pulsos.length; i++) {
-      const p = pulsos[i];
-      const tempoInicioPulso = p.time;
-      const pausaAntes = tempoInicioPulso - tempoAtual;
-
-      if (tempoAtual === 0 && tempoInicioPulso > 0) {
-        arrayFinal.push(0);
-        arrayFinal.push(tempoInicioPulso);
-      } else if (pausaAntes > 0) {
-        arrayFinal.push(pausaAntes);
-      }
-
-      arrayFinal.push(p.onMs);
-      tempoAtual = tempoInicioPulso + p.onMs;
-    }
-
-    return arrayFinal;
-  }
-
-  function pararGravacao() {
-    gravando = false;
-    if (gravadorTimerId) clearInterval(gravadorTimerId);
-    btnIniciarGravacao.textContent = "▶ Gravar com o Vídeo";
-    pararCicloVibracao2D();
-    if (video) video.pause();
-
-    const padraoCompilado = compilarPulsosEmPadrao(pulsosGravados);
-
-    if (padraoCompilado.length > 0) {
-      btnTestarGravacao.disabled = false;
-      btnCopiarGravacao.disabled = false;
-      txtCodigoGravado.value = JSON.stringify(padraoCompilado);
-      exibirToast("Gravação 2D concluída! Pronto para testar 📳");
-    } else {
-      txtCodigoGravado.value = "Nenhum toque foi registrado. Clique em Gravar e toque no painel!";
-    }
-  }
-
-  if (btnIniciarGravacao) {
-    btnIniciarGravacao.addEventListener("click", () => {
-      if (gravando) pararGravacao();
-      else iniciarGravacao();
-    });
-  }
-
-  if (btnTestarGravacao) {
-    btnTestarGravacao.addEventListener("click", () => {
-      try {
-        const padrao = JSON.parse(txtCodigoGravado.value);
-        if (Array.isArray(padrao) && navigator.vibrate) {
-          if (video) {
-            video.currentTime = 0;
-            video.play().catch(() => {});
-          }
-          navigator.vibrate(padrao);
-          exibirToast("Sentindo a vibração gravada com o vídeo... ✨");
-        }
-      } catch (err) {
-        exibirToast("Erro ao processar o padrão gravado.");
-      }
-    });
-  }
-
-  if (btnCopiarGravacao) {
-    btnCopiarGravacao.addEventListener("click", async () => {
-      if (txtCodigoGravado.value) {
-        try {
-          await navigator.clipboard.writeText(txtCodigoGravado.value);
-          exibirToast("Padrão copiado com sucesso! 📋");
-        } catch (err) {
-          txtCodigoGravado.select();
-          document.execCommand("copy");
-          exibirToast("Padrão copiado! 📋");
-        }
-      }
-    });
-  }
 
 });

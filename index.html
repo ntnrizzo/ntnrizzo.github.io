@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Convite de Aniversário</title>
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -21,9 +21,6 @@
       <img src="assets/Video.jpg" alt="Capa do convite" draggable="false">
     </div>
     <button id="btnAbrir" aria-label="Abrir convite"></button>
-    <button id="btnAbrirGravadorCapa" class="btn-abrir-gravador-capa" type="button" aria-label="Abrir gravador de vibração tátil">
-      🎙️ Gravar Vibração
-    </button>
   </div>
 
   <!-- Palco principal com o vídeo e os botões invisíveis -->
@@ -410,65 +407,9 @@
 
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <!-- Painel Estúdio HUD / Gravador com Intensidade Vertical -->
-  <div id="gravadorTatel" class="gravador-tatel" style="display: none;">
-    <div class="gravador-hud">
-      <!-- Topo: Título, Fechar e Timer -->
-      <div class="gravador-hud__header">
-        <div class="gravador-hud__info">
-          <h3>🎙️ Gravador de Vibração Tátil</h3>
-          <span id="badgeIntensidade" class="badge-intensidade">⚡ Toque no painel</span>
-        </div>
-        <div class="gravador-hud__right">
-          <span id="tempoGravador" class="gravador-cronometro">00:00.000</span>
-          <button id="btnFecharGravador" class="btn-fechar-gravador" aria-label="Fechar gravador">&times;</button>
-        </div>
-      </div>
-
-      <!-- Área Central: Pad 2D (Eixo Y = Força | Eixo X = Espaçamento/Frequência) -->
-      <div class="gravador-pad-container">
-        <div id="padVibracao" class="pad-intensidade">
-          <!-- Marcadores do Eixo Y (Intensidade / Força) -->
-          <div class="pad-eixo-y">
-            <span class="marcador-y marcador-y--topo">▲ FORTE (100%)</span>
-            <span class="marcador-y marcador-y--meio">◆ MÉDIO (50%)</span>
-            <span class="marcador-y marcador-y--base">▼ SUAVE (15%)</span>
-          </div>
-
-          <!-- Marcadores do Eixo X (Espaçamento / Ritmo) -->
-          <div class="pad-eixo-x">
-            <span class="marcador-x marcador-x--esq">◄ LENTO / ESPAÇADO</span>
-            <span class="marcador-x marcador-x--dir">RÁPIDO / DENSO ►</span>
-          </div>
-
-          <!-- Cursor 2D / Mira que segue o dedo com dados em tempo real -->
-          <div id="cursor2d" class="cursor-2d" style="display: none;">
-            <div class="cursor-2d__mira"></div>
-            <span id="cursor2dTexto" class="cursor-2d__badge">⚡ 50% | ⏱️ 80ms</span>
-          </div>
-
-          <div class="pad-intensidade__instrucao">
-            <span>Toque e deslize em 2D ✨</span>
-            <small>Cima/Baixo: Força da Vibração<br>Esquerda/Direita: Espaçamento entre Pulsos</small>
-          </div>
-        </div>
-      </div>
-
-      <!-- Barra Inferior: Controles e Ações -->
-      <div class="gravador-hud__footer">
-        <div class="gravador-hud__botoes">
-          <button id="btnIniciarGravacao" class="btn-gravador-acao btn-gravador-acao--gravar" type="button">▶ Gravar com o Vídeo</button>
-          <button id="btnTestarGravacao" class="btn-gravador-acao btn-gravador-acao--testar" type="button" disabled>📳 Sentir Resultado</button>
-          <button id="btnCopiarGravacao" class="btn-gravador-acao btn-gravador-acao--copiar" type="button" disabled>📋 Copiar Padrão</button>
-        </div>
-        <textarea id="txtCodigoGravado" class="gravador-textarea" readonly placeholder="O padrão gravado aparecerá aqui para você copiar..."></textarea>
-      </div>
-    </div>
-  </div>
-
   <!-- Áudio de fundo -->
   <audio id="musica" src="assets/Musica.mp3" loop preload="auto"></audio>
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 
 </html>
