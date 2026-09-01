@@ -10,31 +10,36 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
   background-color: #000;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Base com proporção estática 9:16 centralizada em qualquer tela (PC, Tablet ou Celular) */
+/* Base responsiva: preenche 100% de qualquer tela vertical (9:16 até 9:21+) sem barras pretas */
 .canvas {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  aspect-ratio: 9 / 16;
-  width: min(100vw, calc(100vh * 9 / 16));
-  height: min(100vh, calc(100vw * 16 / 9));
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   max-width: 100vw;
-  max-height: 100vh;
+  max-height: 100dvh;
   overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
   background-color: #000;
 }
 
-@supports (height: 100dvh) {
+/* Moldura centralizada em monitores / telas de computador (Paisagem / Desktop) */
+@media (min-width: 769px) and (min-aspect-ratio: 1/1) {
   .canvas {
-    width: min(100vw, calc(100dvh * 9 / 16));
-    height: min(100dvh, calc(100vw * 16 / 9));
-    max-height: 100dvh;
+    aspect-ratio: 9 / 16;
+    width: min(100vw, calc(96dvh * 9 / 16));
+    height: min(96dvh, calc(100vw * 16 / 9));
+    max-height: 96dvh;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
   }
 }
 
@@ -134,10 +139,16 @@ body {
   opacity: 1;
 }
 
-/* Container de elementos finais (aparecem apenas quando o vídeo termina) */
+/* Container de elementos finais (perfeitamente alinhado com o vídeo em qualquer proporção vertical) */
 .elementos-finais {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 9 / 16;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -149,6 +160,24 @@ body {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+}
+
+/* Foto Final */
+.foto-final {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
+  z-index: 13; /* Atrás dos vagalumes (14) e elementos finais (15) */
+}
+
+.foto-final.visivel {
+  opacity: 1;
+  visibility: visible;
 }
 
 /* Nome da Debutante sobre o retângulo/pergaminho superior */
@@ -391,17 +420,17 @@ body {
    MODAIS — PALACIANO CONTEMPORÂNEO
    ========================================================= */
 :root {
-  --palace-teal-950: #061f25;
-  --palace-teal-900: #082f36;
-  --palace-teal-800: #0b4650;
-  --palace-teal-700: #11616c;
+  --palace-teal-950: #1a0812;
+  --palace-teal-900: #2b0c1e;
+  --palace-teal-800: #551936;
+  --palace-teal-700: #7a264e;
   --palace-gold-700: #9b6a23;
   --palace-gold-500: #d6aa4d;
   --palace-gold-300: #efd98e;
   --palace-ivory: #fbf3df;
   --palace-ivory-2: #f4e7c9;
   --palace-plum: #70507d;
-  --palace-ink: #193f45;
+  --palace-ink: #381a27;
 }
 
 /* =========================================
@@ -552,7 +581,7 @@ body {
   border: 1.5px solid var(--palace-gold-500);
   border-radius: 38% 38% 28px 28px / 10% 10% 28px 28px;
   box-shadow:
-    0 0 0 6px var(--palace-teal-800),
+    0 0 0 6px rgba(235, 165, 182, 0.95),
     0 0 0 8px var(--palace-gold-500),
     0 28px 80px rgba(0, 0, 0, 0.52),
     0 0 45px rgba(214, 170, 77, 0.12),
@@ -624,11 +653,11 @@ body {
   display: grid;
   place-items: center;
   padding: 0 0 2px;
-  color: var(--palace-gold-300);
-  background: rgba(8, 47, 54, 0.96);
-  border: 1px solid var(--palace-gold-500);
+  color: #521a2c;
+  background: linear-gradient(135deg, #f5b5c4 0%, #ea97ad 100%);
+  border: 1px solid #ffd5e0;
   border-radius: 50%;
-  box-shadow: 0 5px 16px rgba(4, 24, 28, 0.26);
+  box-shadow: 0 5px 16px rgba(215, 120, 145, 0.32);
   font: 300 21px/1 Georgia, serif;
   cursor: pointer;
   transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
@@ -636,9 +665,9 @@ body {
 
 .btn-fechar:hover,
 .btn-fechar:focus-visible {
-  background: var(--palace-teal-700);
+  background: linear-gradient(135deg, #fbc5d2 0%, #f0a6ba 100%);
   transform: rotate(8deg) scale(1.06);
-  box-shadow: 0 0 0 3px rgba(239, 217, 142, 0.15), 0 6px 18px rgba(4, 24, 28, 0.32);
+  box-shadow: 0 0 0 3px rgba(245, 181, 196, 0.35), 0 6px 18px rgba(215, 120, 145, 0.38);
   outline: none;
 }
 
@@ -1429,30 +1458,30 @@ body {
    REFINO FINAL — MODAIS JARDIM ENCANTADO (MOBILE-FIRST)
    ========================================================= */
 :root {
-  --garden-bg-950: #08110b;
-  --garden-bg-900: #101b12;
-  --garden-bg-850: #18241a;
-  --garden-green-800: #29402c;
-  --garden-green-700: #365239;
-  --garden-green-600: #4d644b;
-  --garden-sage: #7a8f73;
-  --garden-ink: #2b3a2a;
-  --garden-ink-soft: #455543;
+  --garden-bg-950: #15090f;
+  --garden-bg-900: #200f17;
+  --garden-bg-850: #2a151f;
+  --garden-green-800: #d66485;
+  --garden-green-700: #e27d9a;
+  --garden-green-600: #ed99b0;
+  --garden-sage: #f2b3c4;
+  --garden-ink: #482330;
+  --garden-ink-soft: #633e4c;
   --garden-gold-600: #b89a5b;
   --garden-gold-500: #ccb273;
   --garden-gold-300: #e9dcc0;
   --garden-ivory: #fbf7ea;
   --garden-ivory-2: #f4eddc;
   --garden-ivory-3: #efe5ce;
-  --garden-blush: #b9868b;
+  --garden-blush: #e26b8d;
   --garden-glow: rgba(255, 231, 166, .45);
 }
 
 .modal {
   padding: max(16px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
   background:
-    radial-gradient(circle at 50% 42%, rgba(92, 110, 81, 0.16) 0%, rgba(28, 43, 31, 0.40) 36%, rgba(8, 17, 11, 0.94) 100%),
-    linear-gradient(180deg, rgba(9, 19, 12, .94), rgba(5, 10, 7, .98));
+    radial-gradient(circle at 50% 42%, rgba(220, 140, 165, 0.16) 0%, rgba(45, 18, 28, 0.45) 36%, rgba(14, 5, 10, 0.95) 100%),
+    linear-gradient(180deg, rgba(18, 6, 12, .95), rgba(8, 3, 6, .98));
 }
 
 .modal::before {
@@ -1471,11 +1500,11 @@ body {
 .modal::after {
   inset: -10%;
   background:
-    radial-gradient(ellipse at 4% 10%, rgba(57, 78, 52, 0.82) 0%, rgba(31, 48, 34, 0.32) 24%, transparent 54%),
-    radial-gradient(ellipse at 98% 16%, rgba(52, 72, 49, 0.76) 0%, rgba(26, 42, 30, 0.28) 22%, transparent 52%),
-    radial-gradient(ellipse at 6% 92%, rgba(30, 45, 31, 0.86) 0%, rgba(17, 31, 21, 0.36) 25%, transparent 56%),
-    radial-gradient(ellipse at 97% 90%, rgba(32, 49, 33, 0.80) 0%, rgba(18, 31, 21, 0.34) 24%, transparent 56%),
-    radial-gradient(ellipse at 50% 120%, rgba(76, 98, 67, 0.22), transparent 45%);
+    radial-gradient(ellipse at 4% 10%, rgba(180, 90, 115, 0.55) 0%, rgba(70, 25, 40, 0.28) 24%, transparent 54%),
+    radial-gradient(ellipse at 98% 16%, rgba(170, 85, 110, 0.50) 0%, rgba(65, 22, 35, 0.24) 22%, transparent 52%),
+    radial-gradient(ellipse at 6% 92%, rgba(120, 45, 68, 0.65) 0%, rgba(50, 16, 28, 0.30) 25%, transparent 56%),
+    radial-gradient(ellipse at 97% 90%, rgba(125, 48, 72, 0.60) 0%, rgba(52, 18, 30, 0.28) 24%, transparent 56%),
+    radial-gradient(ellipse at 50% 120%, rgba(190, 95, 125, 0.18), transparent 45%);
   filter: blur(22px);
 }
 
@@ -1490,18 +1519,45 @@ body {
   border: 1px solid rgba(188, 157, 92, 0.72);
   border-radius: 46px 46px 30px 30px;
   box-shadow:
-    0 0 0 5px rgba(26, 49, 31, 0.88),
+    0 0 0 5px rgba(235, 165, 182, 0.95),
     0 0 0 7px rgba(198, 168, 102, 0.92),
     0 18px 52px rgba(0, 0, 0, 0.36),
-    0 0 28px rgba(215, 192, 122, 0.08),
+    0 0 35px rgba(245, 180, 195, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, .92),
     inset 0 -16px 28px rgba(158, 136, 88, 0.04);
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
+  will-change: transform, opacity;
+  transition: transform 260ms cubic-bezier(.16, 1, .3, 1), opacity 260ms ease;
+}
+
+.modal-card.arrastando {
+  transition: none !important;
+}
+
+.modal-card.fechando-swipe {
+  transform: translateY(120%) scale(0.9) !important;
+  opacity: 0 !important;
+  transition: transform 220ms ease-in, opacity 220ms ease-in !important;
+}
+
+.modal-puxador {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 4px;
+  background: rgba(220, 140, 165, 0.35);
+  border-radius: 999px;
+  z-index: 10;
+  pointer-events: none;
 }
 
 .modal-card::before {
   inset: -14px;
   border-radius: 52px;
-  background: radial-gradient(circle at center, rgba(201, 182, 124, 0.10), rgba(101, 127, 96, 0.07) 45%, transparent 72%);
+  background: radial-gradient(circle at center, rgba(201, 182, 124, 0.10), rgba(240, 165, 185, 0.10) 45%, transparent 72%);
   filter: blur(18px);
 }
 
@@ -1517,13 +1573,13 @@ body {
   transform: translateX(-50%) rotate(45deg);
   transform-origin: center;
 
-  background: linear-gradient(180deg, #fffdf6 0%, #f3ebd9 100%);
-  border: 2px solid #324834;
+  background: linear-gradient(180deg, #ffffff 0%, #fef3f6 100%);
+  border: 2px solid #e89eb0;
   border-radius: 4px;
 
   box-shadow:
     0 0 0 2px #c8a763,
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
     0 4px 10px rgba(0, 0, 0, 0.10);
 
   z-index: 4;
@@ -1541,17 +1597,17 @@ body {
   width: 34px;
   height: 34px;
   padding: 0;
-  color: var(--garden-gold-300);
-  background: rgba(25, 45, 28, 0.98);
-  border: 1px solid var(--garden-gold-500);
-  box-shadow: 0 5px 14px rgba(7, 17, 10, 0.24);
+  color: #521a2c;
+  background: linear-gradient(135deg, #f5b5c4 0%, #ea97ad 100%);
+  border: 1px solid #ffd5e0;
+  box-shadow: 0 4px 12px rgba(215, 120, 145, 0.32);
   font: 300 22px/1 Georgia, serif;
 }
 
 .btn-fechar:hover,
 .btn-fechar:focus-visible {
-  background: rgba(45, 69, 49, 0.98);
-  box-shadow: 0 0 0 3px rgba(222, 201, 149, 0.14), 0 6px 16px rgba(7, 17, 10, 0.28);
+  background: linear-gradient(135deg, #fbc5d2 0%, #f0a6ba 100%);
+  box-shadow: 0 0 0 3px rgba(245, 181, 196, 0.35), 0 6px 16px rgba(215, 120, 145, 0.38);
   transform: scale(1.05);
 }
 
@@ -1573,8 +1629,8 @@ body {
 }
 
 .modal-medalhao .modal-icon-soft {
-  stroke: #7c9b88;
-  opacity: .82;
+  stroke: #f095aa;
+  opacity: .88;
 }
 
 .modal-sobretitulo {
@@ -1607,9 +1663,9 @@ body {
   width: 8px;
   height: 8px;
   transform: rotate(45deg);
-  background: linear-gradient(180deg, #6a8775, #91ad95);
-  border: 1px solid rgba(184, 154, 91, .95);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, .35);
+  background: linear-gradient(180deg, #f5b0c1, #fde4eb);
+  border: 1px solid #e28ca0;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .7), 0 0 6px rgba(245, 176, 193, 0.4);
 }
 
 .modal-descricao {
@@ -1671,20 +1727,20 @@ body {
   gap: 7px;
   padding: 7px 16px;
   margin-bottom: 11px;
-  background: linear-gradient(180deg, rgba(84, 104, 77, .95), rgba(57, 78, 52, .98));
-  border: 1px solid rgba(200, 173, 111, 0.88);
-  box-shadow: 0 5px 14px rgba(46, 62, 41, 0.18);
+  background: linear-gradient(180deg, #eb98ad, #da7690);
+  border: 1px solid rgba(255, 225, 235, 0.88);
+  box-shadow: 0 5px 14px rgba(215, 118, 144, 0.25);
 }
 
 .capsula-local-jasmine .capsula-texto {
-  color: #fbf7ea;
+  color: #ffffff;
   font-size: 13.5px;
-  text-shadow: none;
+  text-shadow: 0 1px 2px rgba(80, 20, 35, 0.25);
 }
 
 .capsula-local-jasmine .placa-asa-esq,
 .capsula-local-jasmine .placa-asa-dir {
-  color: var(--garden-gold-300);
+  color: #fff0f5;
 }
 
 .endereco-jasmine {
@@ -1713,44 +1769,46 @@ body {
   gap: 6px;
   padding: 6px 11px;
   border-radius: 16px;
-  color: #fbf7ea;
-  background: linear-gradient(180deg, #495e45 0%, #344934 100%);
-  border: 1px solid rgba(200, 173, 111, .9);
-  box-shadow: 0 7px 16px rgba(35, 49, 36, .16), inset 0 1px 0 rgba(255, 255, 255, .08);
+  color: #ffffff;
+  background: linear-gradient(180deg, #ed9cb0 0%, #db7b93 100%);
+  border: 1px solid rgba(255, 225, 235, .85);
+  box-shadow: 0 7px 16px rgba(215, 115, 140, .26), inset 0 1px 0 rgba(255, 255, 255, .35);
   font-size: 13.2px;
+  text-shadow: 0 1px 2px rgba(90, 20, 40, 0.2);
 }
 
 .btn-acao-jasmine:hover,
 .btn-acao-jasmine:focus-visible {
   transform: translateY(-1px);
-  border-color: #eadab4;
-  background: linear-gradient(180deg, #536a4f 0%, #3d553c 100%);
-  box-shadow: 0 10px 18px rgba(35, 49, 36, .2), 0 0 0 3px rgba(200, 173, 111, .08);
+  border-color: #ffffff;
+  background: linear-gradient(180deg, #f5acc0 0%, #e68ca3 100%);
+  box-shadow: 0 10px 18px rgba(215, 115, 140, .32), 0 0 0 3px rgba(245, 180, 195, .25);
 }
 
 .btn-acao-jasmine--secundario {
   color: var(--garden-ink);
-  background: linear-gradient(180deg, rgba(255, 255, 255, .65), rgba(245, 236, 219, .82));
-  border-color: rgba(191, 163, 102, 0.54);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(255, 243, 246, .92));
+  border-color: rgba(235, 165, 185, 0.6);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .94), 0 6px 14px rgba(85, 69, 40, .05);
+  text-shadow: none;
 }
 
 .btn-acao-jasmine--secundario:hover,
 .btn-acao-jasmine--secundario:focus-visible {
-  background: linear-gradient(180deg, rgba(255, 255, 255, .82), rgba(245, 236, 219, .98));
+  background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 245, 248, .98));
 }
 
 .btn-acao-jasmine--whatsapp {
-  background: linear-gradient(180deg, #3f5b42 0%, #2f4736 100%);
+  background: linear-gradient(180deg, #ed9cb0 0%, #db7b93 100%);
 }
 
 .btn-acao-jasmine__icone {
   width: 28px;
   height: 28px;
   border-radius: 10px;
-  color: var(--garden-gold-300);
-  background: rgba(255, 255, 255, .07);
-  border: 1px solid rgba(233, 220, 192, .22);
+  color: #ffffff;
+  background: rgba(255, 255, 255, .2);
+  border: 1px solid rgba(255, 255, 255, .4);
 }
 
 .btn-acao-jasmine--secundario .btn-acao-jasmine__icone {
@@ -1760,7 +1818,7 @@ body {
 }
 
 .btn-acao-jasmine__seta {
-  color: var(--garden-gold-300);
+  color: #ffffff;
   font-size: 14px;
 }
 
@@ -1776,9 +1834,10 @@ body {
 }
 
 .date-card__dia {
-  background: linear-gradient(180deg, #54694f 0%, #3f543d 100%);
-  color: #f8f3e6;
-  border-right: 1px solid rgba(200, 173, 111, .5);
+  background: linear-gradient(180deg, #ed9cb0 0%, #db7b93 100%);
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(90, 20, 40, 0.2);
+  border-right: 1px solid rgba(255, 225, 235, .6);
   font-size: 33px;
 }
 
@@ -1821,7 +1880,7 @@ body {
 }
 
 .dress-recado__ornamento--fim {
-  color: #7c9b88;
+  color: #f095aa;
   margin-top: 11px;
 }
 
@@ -1836,7 +1895,7 @@ body {
 }
 
 .dress-recado em {
-  color: var(--garden-green-800);
+  color: #d64d73;
   font-family: 'Playfair Display', Georgia, serif;
   font-style: italic;
   font-weight: 700;
@@ -2023,13 +2082,7 @@ body {
 }
 
 /* Para o celular: delicado, sem invadir o conteúdo */
-@media (max-width: 390px) {
-  .modal-folha {
-    width: 67px;
-    height: 67px;
-    opacity: .78;
-  }
-
+@media (max-width: 600px) {
   .modal-folha--tl,
   .modal-folha--tr {
     top: 6px;

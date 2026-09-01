@@ -6,9 +6,9 @@
     </linearGradient>
     <style>
       .stem{stroke:url(#gold);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.78}
-      .leaf{fill:#849078;stroke:#a9905d;stroke-width:.7;opacity:.78}
-      .flower{fill:#d5aaa8;stroke:#b99582;stroke-width:.65;opacity:.78}
-      .bud{fill:#cdbd91;opacity:.8}
+      .leaf{fill:#f7cdd6;stroke:#e8a5b4;stroke-width:.7;opacity:.88}
+      .flower{fill:#fff0f3;stroke:#f2bac6;stroke-width:.65;opacity:.95}
+      .bud{fill:#fce4ea;opacity:.9}
     </style>
   </defs>
 

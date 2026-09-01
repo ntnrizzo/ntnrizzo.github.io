@@ -30,6 +30,9 @@
         <source src="assets/Video.mp4" type="video/mp4">
       </video>
 
+      <!-- Foto final que aparece após o vídeo -->
+      <img id="fotoFinal" class="foto-final" src="assets/Final.jpg" alt="Foto Final" aria-hidden="true">
+
       <!-- Efeito de vagalumes mágicos nas laterais -->
       <canvas id="canvasVagalumes" class="canvas-vagalumes"></canvas>
 
@@ -121,6 +124,7 @@
     aria-labelledby="titPresentes">
     <canvas class="canvas-vagalumes-modal" aria-hidden="true"></canvas>
     <div class="modal-card modal-card--presente" role="document">
+      <div class="modal-puxador" aria-hidden="true"></div>
       <button class="btn-fechar" aria-label="Fechar modal">&times;</button>
       <div class="modal-folhas-borda" aria-hidden="true">
         <span class="modal-folha modal-folha--tl"></span>
@@ -172,6 +176,7 @@
     aria-labelledby="titChegar">
     <canvas class="canvas-vagalumes-modal" aria-hidden="true"></canvas>
     <div class="modal-card modal-card--chegar" role="document">
+      <div class="modal-puxador" aria-hidden="true"></div>
       <button class="btn-fechar" aria-label="Fechar modal">&times;</button>
       <div class="modal-folhas-borda" aria-hidden="true">
         <span class="modal-folha modal-folha--tl"></span>
@@ -249,6 +254,7 @@
   <div id="modalAgenda" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="titAgenda">
     <canvas class="canvas-vagalumes-modal" aria-hidden="true"></canvas>
     <div class="modal-card modal-card--agenda" role="document">
+      <div class="modal-puxador" aria-hidden="true"></div>
       <button class="btn-fechar" aria-label="Fechar modal">&times;</button>
       <div class="modal-folhas-borda" aria-hidden="true">
         <span class="modal-folha modal-folha--tl"></span>
@@ -319,6 +325,7 @@
   <div id="modalRsvp" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="titRsvp">
     <canvas class="canvas-vagalumes-modal" aria-hidden="true"></canvas>
     <div class="modal-card modal-card--rsvp" role="document">
+      <div class="modal-puxador" aria-hidden="true"></div>
       <button class="btn-fechar" aria-label="Fechar modal">&times;</button>
       <div class="modal-folhas-borda" aria-hidden="true">
         <span class="modal-folha modal-folha--tl"></span>
@@ -368,6 +375,7 @@
   <div id="modalDressCode" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="titDress">
     <canvas class="canvas-vagalumes-modal" aria-hidden="true"></canvas>
     <div class="modal-card modal-card--dress" role="document">
+      <div class="modal-puxador" aria-hidden="true"></div>
       <button class="btn-fechar" aria-label="Fechar modal">&times;</button>
 
       <div class="modal-conteudo modal-conteudo--recado">

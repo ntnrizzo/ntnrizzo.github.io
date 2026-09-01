@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const musica = document.getElementById("musica");
   const toast = document.getElementById("toast");
   const elementosFinais = document.getElementById("elementosFinais");
+  const fotoFinal = document.getElementById("fotoFinal");
 
   // Botões principais
   const btnPresentes = document.getElementById("btnPresentes");
@@ -85,6 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function exibirElementosFinais() {
     if (elementosFinais) {
       elementosFinais.classList.add("visivel");
+    }
+    if (fotoFinal) {
+      fotoFinal.classList.add("visivel");
     }
   }
 
@@ -252,6 +256,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Pausar/retomar áudio e vídeo quando o usuário sai ou volta para a aba/aplicativo
+  let audioEstavaTocando = false;
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (musica && !musica.paused) {
+        audioEstavaTocando = true;
+        musica.pause();
+      }
+      if (video && !video.paused) {
+        video.pause();
+      }
+    } else {
+      if (audioEstavaTocando && musica && musicaIniciada) {
+        musica.play().catch((e) => console.warn("Retomada de áudio em segundo plano impedida:", e));
+        audioEstavaTocando = false;
+      }
+      // Se o vídeo ainda não acabou e foi pausado ao sair
+      if (video && video.currentTime > 0 && !video.ended && video.currentTime < 17) {
+        video.play().catch(() => {});
+      }
+    }
+  });
+
+  window.addEventListener("pagehide", () => {
+    if (musica) musica.pause();
+    if (video) video.pause();
+  });
+
   // =========================================
   // SISTEMA DE VAGALUMES MÁGICOS NOS MODAIS
   // =========================================
@@ -384,6 +417,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // =========================================
+  // FEEDBACK TÁTIL (VIBRATION API)
+  // =========================================
+  function vibrar(ms = 15) {
+    if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(ms);
+      } catch (e) {}
+    }
+  }
+
+  // Ativa vibração suave em botões e elementos interativos
+  document.querySelectorAll("button, .btn-link, .btn-acao-jasmine, .pix-card, #btnAbrir").forEach((el) => {
+    el.addEventListener("pointerdown", () => vibrar(12), { passive: true });
+  });
+
   // Controle de abertura de Modais
   let ultimoFoco = null;
 
@@ -392,8 +441,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.body.classList.contains("modo-ajuste-ativo")) return;
     if (!modal) return;
 
+    vibrar(14);
     ultimoFoco = document.activeElement;
     fecharTodosModais(false);
+
+    const card = modal.querySelector(".modal-card");
+    if (card) {
+      card.style.transform = "";
+      card.style.opacity = "";
+      card.classList.remove("arrastando", "fechando-swipe");
+    }
+
     modal.classList.add("ativo");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("modal-aberto");
@@ -411,6 +469,12 @@ document.addEventListener("DOMContentLoaded", () => {
     todosModais.forEach((m) => {
       m.classList.remove("ativo");
       m.setAttribute("aria-hidden", "true");
+      const card = m.querySelector(".modal-card");
+      if (card) {
+        card.style.transform = "";
+        card.style.opacity = "";
+        card.classList.remove("arrastando", "fechando-swipe");
+      }
     });
     document.body.classList.remove("modal-aberto");
 
@@ -419,6 +483,78 @@ document.addEventListener("DOMContentLoaded", () => {
       ultimoFoco = null;
     }
   }
+
+  // =========================================
+  // GESTO DE SWIPE DOWN PARA FECHAR MODAIS
+  // =========================================
+  document.querySelectorAll(".modal-card").forEach((card) => {
+    let startY = 0;
+    let currentY = 0;
+    let deltaY = 0;
+    let isDragging = false;
+    const conteudo = card.querySelector(".modal-conteudo");
+
+    card.addEventListener("touchstart", (e) => {
+      // Inicia apenas com 1 dedo e se o scroll interno estiver no topo
+      if (e.touches.length > 1) return;
+      if (conteudo && conteudo.scrollTop > 6) return;
+
+      startY = e.touches[0].clientY;
+      currentY = startY;
+      deltaY = 0;
+      isDragging = true;
+      card.classList.remove("fechando-swipe");
+    }, { passive: true });
+
+    card.addEventListener("touchmove", (e) => {
+      if (!isDragging) return;
+      currentY = e.touches[0].clientY;
+      deltaY = currentY - startY;
+
+      // Arrasta apenas para baixo
+      if (deltaY > 0) {
+        if (conteudo && conteudo.scrollTop > 0) {
+          conteudo.scrollTop = 0;
+        }
+        card.classList.add("arrastando");
+        const fatorEscala = Math.max(0.88, 1 - deltaY * 0.0004);
+        const opacidade = Math.max(0.25, 1 - deltaY / 360);
+        card.style.transform = `translateY(${deltaY}px) scale(${fatorEscala})`;
+        card.style.opacity = opacidade;
+      } else {
+        card.classList.remove("arrastando");
+        card.style.transform = "";
+        card.style.opacity = "";
+      }
+    }, { passive: true });
+
+    const finalizarArrasto = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      card.classList.remove("arrastando");
+
+      if (deltaY > 75) {
+        // Dispara fechamento por swipe
+        vibrar(20);
+        card.classList.add("fechando-swipe");
+        setTimeout(() => {
+          fecharTodosModais();
+          card.classList.remove("fechando-swipe");
+          card.style.transform = "";
+          card.style.opacity = "";
+          deltaY = 0;
+        }, 210);
+      } else {
+        // Retorno suave à posição original
+        card.style.transform = "";
+        card.style.opacity = "";
+        deltaY = 0;
+      }
+    };
+
+    card.addEventListener("touchend", finalizarArrasto, { passive: true });
+    card.addEventListener("touchcancel", finalizarArrasto, { passive: true });
+  });
 
   if (btnPresentes) btnPresentes.addEventListener("click", () => abrirModal(modalPresentes));
   if (btnComoChegar) btnComoChegar.addEventListener("click", () => abrirModal(modalComoChegar));
@@ -430,6 +566,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".btn-fechar").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
+      vibrar(12);
       fecharTodosModais();
     });
   });
