@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const chavePix = "SUA_CHAVE_PIX_AQUI";
+
 
   const capa = document.getElementById("capa");
   const btnAbrir = document.getElementById("btnAbrir");
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const todosModais = document.querySelectorAll(".modal");
 
   // Elementos internos dos modais
-  const boxCopiarPix = document.getElementById("boxCopiarPix");
+
   const btnGoogleCalendar = document.getElementById("btnGoogleCalendar");
   const btnAppleCalendar = document.getElementById("btnAppleCalendar");
 
@@ -287,10 +287,31 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    if (video.currentTime >= 17) {
+    // Exibe os elementos finais próximo ao término do vídeo (o vídeo tem ~10s de duração)
+    if (video.currentTime >= 8.8 || (video.duration && video.currentTime >= video.duration - 1.0)) {
       exibirElementosFinais();
+      iniciarVagalumes();
     }
   });
+
+  // Se o vídeo falhar ao carregar ou reproduzir, garante a exibição dos elementos finais
+  video.addEventListener("error", () => {
+    exibirElementosFinais();
+    iniciarVagalumes();
+  });
+
+  // Permite ao convidado tocar no palco para avançar direto para os botões e contagem sem esperar
+  const palco = document.getElementById("palco");
+  if (palco) {
+    palco.addEventListener("click", (e) => {
+      if (e.target.closest("#hotspots") || e.target.closest(".modal")) return;
+      if (elementosFinais && !elementosFinais.classList.contains("visivel")) {
+        video.pause();
+        exibirElementosFinais();
+        iniciarVagalumes();
+      }
+    });
+  }
 
   // Pausar/retomar áudio e vídeo quando o usuário sai ou volta para a aba/aplicativo
   let audioEstavaTocando = false;
@@ -475,8 +496,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let ultimoFoco = null;
 
   function abrirModal(modal) {
-    // Não abre modais se o Modo Ajuste estiver ativo
-    if (document.body.classList.contains("modo-ajuste-ativo")) return;
     if (!modal) return;
 
     vibrar(14);
@@ -624,34 +643,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Copiar chave Pix (mouse, toque e teclado)
-  async function copiarPix() {
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(chavePix);
-      } else {
-        throw new Error("Fallback para input");
-      }
-    } catch {
-      const input = document.createElement("input");
-      input.value = chavePix;
-      document.body.appendChild(input);
-      input.select();
-      document.execCommand("copy");
-      document.body.removeChild(input);
-    }
-    exibirToast("Chave Pix copiada ✦");
-  }
 
-  if (boxCopiarPix) {
-    boxCopiarPix.addEventListener("click", copiarPix);
-    boxCopiarPix.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        copiarPix();
-      }
-    });
-  }
 
   // Ação: Google Calendar
   if (btnGoogleCalendar) {

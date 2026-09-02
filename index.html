@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Convite de Aniversário</title>
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -18,7 +18,7 @@
   <!-- Capa inicial de desbloqueio de áudio/vídeo -->
   <div id="capa">
     <div class="canvas">
-      <img src="assets/Video.jpg" alt="Capa do convite" draggable="false">
+      <img src="assets/Capa.jpg" alt="Capa do convite" draggable="false">
     </div>
     <button id="btnAbrir" aria-label="Abrir convite"></button>
   </div>
@@ -26,7 +26,7 @@
   <!-- Palco principal com o vídeo e os botões invisíveis -->
   <main id="palco">
     <div class="canvas">
-      <video id="video" playsinline webkit-playsinline muted preload="auto" poster="assets/Video.jpg" draggable="false">
+      <video id="video" playsinline webkit-playsinline muted preload="auto" poster="assets/Capa.jpg" draggable="false">
         <source src="assets/Video.mp4" type="video/mp4">
       </video>
 
@@ -61,7 +61,7 @@
           </div>
         </div>
 
-        <!-- Navegação com os 4 botões circulares perfeitamente centralizados nos anéis dourados -->
+        <!-- Navegação com os 5 botões circulares perfeitamente centralizados nos anéis dourados -->
         <nav id="hotspots">
           <button id="btnDressCode" class="btn-link" aria-label="Um pedido especial" title="Um pedido especial">
             <svg class="icone-dourado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -93,6 +93,17 @@
               <circle cx="12" cy="14.5" r="1.6" fill="currentColor" />
               <circle cx="7.5" cy="14.5" r="1.2" fill="currentColor" />
               <circle cx="16.5" cy="14.5" r="1.2" fill="currentColor" />
+            </svg>
+          </button>
+          <button id="btnPresentes" class="btn-link" aria-label="Sugestões de presentes" title="Sugestões de presentes">
+            <svg class="icone-dourado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8" fill="currentColor" fill-opacity="0.2" />
+              <path d="M4 12h16" />
+              <rect x="3" y="7" width="18" height="5" rx="1" fill="currentColor" fill-opacity="0.3" />
+              <path d="M12 22V7" stroke-width="1.8" />
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
             </svg>
           </button>
           <button id="btnRsvp" class="btn-link" aria-label="Confirmar Presença" title="Confirmar Presença">
@@ -146,27 +157,43 @@
         </div>
 
         <p class="modal-sobretitulo">Um carinho, se você desejar</p>
-        <h2 id="titPresentes" class="modal-titulo">Sugestão de Presente</h2>
+        <h2 id="titPresentes" class="modal-titulo">Sugestões de Presentes</h2>
         <div class="modal-divisor" aria-hidden="true"><span></span><i></i><span></span></div>
 
-        <p class="modal-descricao">Sua presença já é o presente principal. Para quem quiser deixar um mimo, esta é a
-          nossa chave Pix:</p>
+        <p class="modal-descricao">Sua presença já é o maior presente! Mas caso deseje me presentear, preparei algumas sugestões com carinho:</p>
 
-        <div class="pix-card" id="boxCopiarPix" role="button" tabindex="0" aria-label="Copiar chave Pix"
-          title="Toque para copiar a chave Pix">
-          <span class="pix-card__label">Chave Pix</span>
-          <div class="pix-card__linha">
-            <strong id="textoChavePix">SUA_CHAVE_PIX_AQUI</strong>
-            <span class="pix-card__copy" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none">
-                <rect x="9" y="9" width="11" height="11" rx="2" />
-                <path d="M15 6V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h1" />
-              </svg>
-            </span>
+        <div class="lista-presentes-jasmine" aria-label="Lista de sugestões de presentes">
+          <div class="item-presente">
+            <span class="item-presente__icone">✦</span>
+            <span class="item-presente__texto">Perfumes</span>
+          </div>
+          <div class="item-presente">
+            <span class="item-presente__icone">✦</span>
+            <span class="item-presente__texto">Cremes</span>
+          </div>
+          <div class="item-presente">
+            <span class="item-presente__icone">✦</span>
+            <span class="item-presente__texto">Roupas <small>(tamanho P/PP)</small></span>
+          </div>
+          <div class="item-presente">
+            <span class="item-presente__icone">✦</span>
+            <span class="item-presente__texto">Calçado <small>(nº 37)</small></span>
+          </div>
+          <div class="item-presente">
+            <span class="item-presente__icone">✦</span>
+            <span class="item-presente__texto">Acessórios dourado</span>
+          </div>
+          <div class="item-presente">
+            <span class="item-presente__icone">✦</span>
+            <span class="item-presente__texto">Maquiagem</span>
+          </div>
+          <div class="item-presente">
+            <span class="item-presente__icone">✦</span>
+            <span class="item-presente__texto">Artigos religiosos</span>
           </div>
         </div>
 
-        <p class="modal-microcopy"><span>✦</span> Toque para copiar automaticamente</p>
+
       </div>
     </div>
   </div>
@@ -409,7 +436,7 @@
 
   <!-- Áudio de fundo -->
   <audio id="musica" src="assets/Musica.mp3" loop preload="auto"></audio>
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=8"></script>
 </body>
 
 </html>
