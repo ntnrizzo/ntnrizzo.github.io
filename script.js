@@ -65,9 +65,213 @@ document.addEventListener("DOMContentLoaded", () => {
   atualizarContagem();
   setInterval(atualizarContagem, 1000);
 
-  // Garante que o primeiro frame do vídeo seja renderizado no fundo enquanto a capa está visível
-  video.currentTime = 0;
-  video.load();
+  const loading = document.getElementById("loading");
+  const loadingMensagem = document.getElementById("loadingMensagem");
+  const loadingProgresso = document.getElementById("loadingProgresso");
+  const loadingPercentual = document.getElementById("loadingPercentual");
+  const loadingTentar = document.getElementById("loadingTentar");
+  let convitePronto = false;
+  let conviteAberto = false;
+  // Mantém os blobs durante a visita, inclusive ao voltar pelo histórico (bfcache).
+  const midiasPreparadas = new Map();
+  const imagensPreparadas = new Map();
+  let carregando = false;
+  let tentativas = 0;
+
+  async function prepararConvite() {
+    if (carregando || convitePronto) return;
+    carregando = true;
+    tentativas++;
+    loadingTentar.hidden = true;
+    loading.setAttribute("aria-busy", "true");
+    loadingMensagem.textContent = "Preparando cada detalhe do seu convite…";
+    const controller = new AbortController();
+    const { signal } = controller;
+    const progresso = new Map();
+    const imagens = [...new Set([
+      ...Array.from(document.images, img => img.getAttribute("src")),
+      "assets/folhas-recado.svg", "assets/folhas-canto-modal.svg",
+    ].filter(Boolean))];
+    const total = imagens.length + 3; // Imagens, duas mídias e fontes.
+    function atualizar(chave, valor) {
+      if (signal.aborted) return;
+      progresso.set(chave, valor);
+      const percentual = Math.min(99, Math.floor([...progresso.values()].reduce((a, b) => a + b, 0) / total * 100));
+      loadingProgresso.value = percentual;
+      loadingPercentual.textContent = `${percentual}%`;
+    }
+    atualizar("inicio", 0);
+
+    // O limite é de inatividade: downloads lentos continuam enquanto houver dados.
+    async function baixar(url) {
+      let timer;
+      const renovar = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => controller.abort(), 45000);
+      };
+      renovar();
+      try {
+        const response = await fetch(url, { signal, cache: tentativas > 1 ? "reload" : "default" });
+        if (!response.ok) throw new Error(`Falha ao baixar ${url}: ${response.status}`);
+        const tamanho = Number(response.headers.get("content-length"));
+        if (!response.body) return await response.blob();
+        const reader = response.body.getReader();
+        const partes = [];
+        let recebidos = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          partes.push(value);
+          recebidos += value.byteLength;
+          renovar();
+          if (tamanho > 0) atualizar(url, Math.min(.95, recebidos / tamanho * .95));
+        }
+        return new Blob(partes, { type: response.headers.get("content-type") || "application/octet-stream" });
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function prepararMidia(elemento, url) {
+      if (!midiasPreparadas.has(url)) {
+        const origem = new URL(url, document.baseURI);
+        const arquivoLocal = origem.protocol === "file:";
+        let local = origem.href;
+        // Chrome bloqueia fetch(file://). Nesse caso os arquivos já estão no
+        // computador e devem ser abertos diretamente pelo player nativo.
+        if (!arquivoLocal) {
+          const blob = await baixar(url);
+          if (!blob.size) throw new Error(`Arquivo vazio: ${url}`);
+          if (signal.aborted) throw new Error("Download interrompido");
+          local = URL.createObjectURL(blob);
+          atualizar(url, 1);
+        }
+        try {
+          await new Promise((resolve, reject) => {
+            let timer;
+            let timerFrame;
+            const limpar = () => {
+              clearTimeout(timer);
+              clearTimeout(timerFrame);
+              elemento.removeEventListener("loadeddata", pronto);
+              elemento.removeEventListener("canplay", pronto);
+              elemento.removeEventListener("loadedmetadata", metadadosProntos);
+              elemento.removeEventListener("error", erro);
+              signal.removeEventListener("abort", erro);
+            };
+            const pronto = () => { limpar(); resolve(); };
+            const erro = () => { limpar(); reject(new Error(`Não foi possível preparar ${url}`)); };
+            const metadadosProntos = () => {
+              // Para arquivos locais, só permite a espera curta após confirmar
+              // que o player conseguiu abrir o arquivo e ler seus metadados.
+              clearTimeout(timerFrame);
+              timerFrame = setTimeout(pronto, 1500);
+            };
+            // Na web, o blob já contém o download inteiro. No disco, aguarda
+            // uma confirmação real de leitura em vez de liberar por tempo.
+            timer = setTimeout(arquivoLocal ? erro : pronto, arquivoLocal ? 45000 : 1500);
+            elemento.addEventListener("loadeddata", pronto);
+            elemento.addEventListener("canplay", pronto);
+            if (arquivoLocal) elemento.addEventListener("loadedmetadata", metadadosProntos);
+            elemento.addEventListener("error", erro);
+            signal.addEventListener("abort", erro, { once: true });
+            elemento.src = local;
+            elemento.load();
+            if (signal.aborted) erro();
+            else if (elemento.readyState >= 2) pronto();
+            else if (arquivoLocal && elemento.readyState >= 1) metadadosProntos();
+          });
+          midiasPreparadas.set(url, local);
+        } catch (error) {
+          elemento.removeAttribute("src");
+          elemento.load();
+          if (!arquivoLocal) URL.revokeObjectURL(local);
+          throw error;
+        }
+      }
+      atualizar(url, 1);
+    }
+
+    async function prepararImagem(url) {
+      if (!imagensPreparadas.has(url)) {
+        const img = new Image();
+        await new Promise((resolve, reject) => {
+          const limpar = () => {
+            clearTimeout(timer);
+            img.onload = img.onerror = null;
+            signal.removeEventListener("abort", erro);
+          };
+          const erro = () => { limpar(); reject(new Error(`Não foi possível preparar ${url}`)); };
+          const timer = setTimeout(erro, 45000);
+          img.onload = () => { limpar(); resolve(); };
+          img.onerror = erro;
+          signal.addEventListener("abort", erro, { once: true });
+          img.src = url;
+          if (signal.aborted) erro();
+        });
+        // onload já confirmou a imagem. Alguns navegadores rejeitam decode()
+        // de SVGs válidos, que podem continuar sendo renderizados normalmente.
+        if (img.decode) {
+          let timer;
+          try {
+            await Promise.race([
+              img.decode().catch(() => {}),
+              new Promise(resolve => { timer = setTimeout(resolve, 1500); }),
+            ]);
+          } finally {
+            clearTimeout(timer);
+          }
+        }
+        imagensPreparadas.set(url, img);
+      }
+      atualizar(url, 1);
+    }
+
+    try {
+      await Promise.all([
+        ...imagens.map(prepararImagem),
+        prepararMidia(video, video.querySelector("source").dataset.src),
+        prepararMidia(musica, musica.dataset.src),
+        (async () => {
+          // Carrega também fontes usadas nos modais ainda ocultos.
+          // Fontes indisponíveis usam as alternativas já definidas no CSS.
+          if (document.fonts) {
+            let timer;
+            try {
+              await Promise.race([
+                Promise.allSettled([...document.fonts].map(font => font.load())),
+                new Promise(resolve => {
+                  timer = setTimeout(resolve, 4000);
+                }),
+              ]);
+            } finally {
+              clearTimeout(timer);
+            }
+          }
+          atualizar("fontes", 1);
+        })(),
+      ]);
+      convitePronto = true;
+      loadingProgresso.value = 100;
+      loadingPercentual.textContent = "100%";
+      loadingMensagem.textContent = "Tudo pronto. Abra seu convite!";
+      loading.setAttribute("aria-busy", "false");
+      loading.classList.add("concluido");
+      capa.inert = false;
+      btnAbrir.disabled = false;
+      btnAbrir.focus({ preventScroll: true });
+    } catch (error) {
+      controller.abort();
+      loading.setAttribute("aria-busy", "false");
+      loadingMensagem.textContent = "Não foi possível carregar tudo. Verifique sua conexão e tente novamente.";
+      loadingTentar.hidden = false;
+      console.warn("Carregamento do convite interrompido:", error);
+    } finally {
+      carregando = false;
+    }
+  }
+  loadingTentar.addEventListener("click", prepararConvite);
+  prepararConvite();
 
   let toastTimer = null;
 
@@ -219,6 +423,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Abertura do convite com transição suave, áudio e experiência tátil
   btnAbrir.addEventListener("click", async () => {
+    if (!convitePronto || conviteAberto) return;
+    conviteAberto = true;
+    btnAbrir.disabled = true;
+    // Aciona os dois players no mesmo gesto para liberar áudio no celular.
+    musica.volume = 0;
+    const liberarMusica = musica.play().then(() => {
+      musica.pause();
+      musica.currentTime = 0;
+    }).catch(e => console.warn("Autoplay de áudio bloqueado:", e));
+
+    try {
+      video.muted = false;
+      await video.play();
+    } catch {
+      try {
+        video.muted = true;
+        await video.play();
+      } catch {
+        conviteAberto = false;
+        btnAbrir.disabled = false;
+        exibirToast("Toque novamente para abrir o convite.");
+        return;
+      }
+    }
+    document.getElementById("palco").inert = false;
+    capa.inert = true;
     capa.style.opacity = "0";
     setTimeout(() => {
       capa.style.display = "none";
@@ -227,21 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Inicia a sinfonia tátil dos vagalumes sincronizada
     iniciarExperienciaTatelVagalumes();
 
-    try {
-      video.muted = false;
-      await video.play();
-    } catch {
-      video.muted = true;
-      video.play();
-    }
-
-    try {
-      musica.volume = 0;
-      await musica.play();
-      musica.pause(); // Pausa imediatamente, apenas para liberar o autoplay do navegador
-    } catch (e) {
-      console.warn("Autoplay de áudio bloqueado:", e);
-    }
+    await liberarMusica;
   });
 
   // Congela o vídeo no último frame ao terminar e ativa os vagalumes
@@ -296,6 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Se o vídeo falhar ao carregar ou reproduzir, garante a exibição dos elementos finais
   video.addEventListener("error", () => {
+    if (!conviteAberto) return;
     exibirElementosFinais();
     iniciarVagalumes();
   });
@@ -304,6 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const palco = document.getElementById("palco");
   if (palco) {
     palco.addEventListener("click", (e) => {
+      if (!conviteAberto) return;
       if (e.target.closest("#hotspots") || e.target.closest(".modal")) return;
       if (elementosFinais && !elementosFinais.classList.contains("visivel")) {
         video.pause();

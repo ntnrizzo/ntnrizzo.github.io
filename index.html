@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Keylla 15 Anos</title>
   <link rel="icon" href="assets/favicon-keylla.png" type="image/png">
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=12">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -24,20 +24,32 @@
 </head>
 
 <body>
+  <section id="loading" aria-labelledby="loadingTitulo" aria-busy="true">
+    <div class="loading-conteudo">
+      <div class="loading-emblema"><img src="assets/favicon-keylla.png" alt="Keylla, 15 anos" width="180" height="180"><span></span></div>
+      <h1 id="loadingTitulo">A magia está chegando</h1>
+      <p id="loadingMensagem" role="status" aria-live="polite">Preparando cada detalhe do seu convite…</p>
+      <progress id="loadingProgresso" max="100" value="0" aria-label="Carregamento do convite"></progress>
+      <span id="loadingPercentual" aria-hidden="true">0%</span>
+      <button id="loadingTentar" type="button" hidden>Tentar novamente</button>
+      <span class="loading-assinatura">KEYLLA <span>✦</span> 15 ANOS</span>
+    </div>
+  </section>
+  <noscript><p style="position:fixed;inset:0;z-index:10001;background:#102c24;color:#fff;padding:30px">Ative o JavaScript para carregar e abrir o convite.</p></noscript>
 
   <!-- Capa inicial de desbloqueio de áudio/vídeo -->
-  <div id="capa">
+  <div id="capa" inert>
     <div class="canvas">
       <img src="assets/Capa.jpg" alt="Capa do convite" draggable="false">
     </div>
-    <button id="btnAbrir" aria-label="Abrir convite"></button>
+    <button id="btnAbrir" aria-label="Abrir convite" disabled></button>
   </div>
 
   <!-- Palco principal com o vídeo e os botões invisíveis -->
-  <main id="palco">
+  <main id="palco" inert>
     <div class="canvas">
       <video id="video" playsinline webkit-playsinline muted preload="auto" poster="assets/Capa.jpg" draggable="false">
-        <source src="assets/Video.mp4" type="video/mp4">
+        <source data-src="assets/Video.mp4" type="video/mp4">
       </video>
 
       <!-- Foto final que aparece após o vídeo -->
@@ -393,6 +405,7 @@
         <h2 id="titRsvp" class="modal-titulo">Confirmar Presença</h2>
         <div class="modal-divisor" aria-hidden="true"><span></span><i></i><span></span></div>
         <p class="modal-descricao modal-descricao--curta">Sua presença vai tornar essa noite ainda mais especial.</p>
+        <p class="modal-descricao modal-descricao--curta">Confirme sua presença até <strong><time datetime="2026-09-26">26/09/2026</time></strong>.</p>
 
         <div class="acoes-modal-jasmine">
           <a id="btnWhatsAppRsvp"
@@ -451,8 +464,8 @@
   <div id="toast" role="status" aria-live="polite"></div>
 
   <!-- Áudio de fundo -->
-  <audio id="musica" src="assets/Musica.mp3" loop preload="auto"></audio>
-  <script src="script.js?v=8"></script>
+  <audio id="musica" data-src="assets/Musica.mp3" loop preload="auto"></audio>
+  <script src="script.js?v=11"></script>
 </body>
 
 </html>
