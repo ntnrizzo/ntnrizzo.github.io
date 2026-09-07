@@ -311,7 +311,7 @@ body {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
-/* Botões interativos sobre os 4 círculos do vídeo */
+/* Botões interativos sobre os 5 círculos do convite */
 #hotspots {
   position: absolute;
   inset: 0;
@@ -349,25 +349,26 @@ body {
   transform: translate(-50%, -50%) scale(0.96);
 }
 
-/* Ícones Dourados Vetoriais (SVG) */
+/* Ícones em rosa claro (SVG) */
 .icone-dourado {
   width: 58%;
   height: 58%;
-  color: #f7d070;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 4px rgba(247, 208, 112, 0.45));
+  color: #f7c7d6;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 4px rgba(247, 199, 214, 0.45));
   transition: transform 0.25s ease, filter 0.25s ease, color 0.25s ease;
 }
 
 .btn-link:hover .icone-dourado,
 .btn-link:focus-visible .icone-dourado {
-  color: #fff8d6;
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(255, 235, 120, 0.85));
+  color: #ffe9f0;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 8px rgba(255, 213, 226, 0.85));
 }
 
-/* Posições centrais dos 5 botões sobre cada anel dourado */
+/* Centros dos círculos em assets/Final.jpg (720 × 1280).
+   Percentuais mantêm o alinhamento ao redimensionar o convite. */
 #btnDressCode {
-  top: 88.4%;
-  left: 18.0%;
+  top: 88.3%;
+  left: 18.2%;
 }
 
 #btnComoChegar {
@@ -376,18 +377,18 @@ body {
 }
 
 #btnAgenda {
-  top: 88.4%;
-  left: 48.8%;
+  top: 88.3%;
+  left: 48.9%;
 }
 
 #btnPresentes {
   top: 88.3%;
-  left: 64.5%;
+  left: 64.3%;
 }
 
 #btnRsvp {
-  top: 88.4%;
-  left: 79.6%;
+  top: 88.3%;
+  left: 79.7%;
 }
 
 /* Dica interativa com setinha abaixo dos botões */
@@ -416,7 +417,7 @@ body {
 
 .seta-cima {
   font-size: clamp(10px, 1.3vh, 13px);
-  color: #ffd700;
+  color: #f7c7d6;
   line-height: 1;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
   animation: flutuarSeta 1.4s infinite ease-in-out;
